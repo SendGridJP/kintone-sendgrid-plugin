@@ -1,0 +1,53 @@
+{
+    "manifest_version": 1,
+    "version": 1,
+    "type": "APP",
+    "name": {
+        "ja": "SendGrid plug-in",
+        "en": "SendGrid plug-in",
+        "zh": "SendGrid plug-in"
+    },
+    "description": {
+        "ja": "SendGrid can send Email.",
+        "en": "SendGrid can send Email.",
+        "zh": "SendGrid can send Email."
+    },
+    "icon": "image/image.png",
+    "homepage_url": {
+        "ja": "https://sendgrid.com/",
+        "en": "https://sendgrid.com/",
+        "zh": "https://sendgrid.com/"
+    },
+    "desktop": {
+        "js": [
+            "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
+            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "js/SendGridMail.js"
+        ],
+        "css": [
+            "css/51-us-default.css",
+            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css"
+        ]
+    },
+    "config": {
+        "html": "html/SendGridConfig.html",
+        "js": [
+            "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
+            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "js/SendGridConfig.js"
+        ],
+        "css": [
+            "css/51-us-default.css",
+            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css",
+            "css/sendgrid-design.css"
+
+        ],
+        "required_params": [
+            "sendgridApiKey",
+            "templateName",
+            "templateId",
+            "emailFieldCode",
+            "from"
+        ]
+    }
+}
