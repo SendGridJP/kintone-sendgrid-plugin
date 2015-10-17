@@ -6,6 +6,7 @@ jQuery.noConflict();
     var initialFlag = true;
     var selectFlag = false;
     var valArray = [];
+    var headers = {};
 
     var addSub = function(default_val, default_code, resp) {
         var subContainer = $('#sub_container');
@@ -101,7 +102,15 @@ jQuery.noConflict();
         var appId = kintone.app.getId();
         //Get existing data.
         if (Object.keys(conf).length > 0) {
-            $('#sendgrid_apikey').val(conf.sendgridApiKey);
+            var cg = kintone.plugin.app.getProxyConfig(
+                'https://api.sendgrid.com/', 'POST'
+            );
+            if (cg !== null) {
+                var apiKey = cg.headers.Authorization.match(/^Bearer\s(.*)$/);
+                if (apiKey[1].length > 0) {
+                    $('#sendgrid_apikey').val(apiKey[1]);
+                }
+            }
             $('#from').val(conf.from);
             //Display the selected template.
             var opTag = $('<option/>');
@@ -113,7 +122,6 @@ jQuery.noConflict();
             templateSelect.append(opTag);
             //Get codes in this template
             var getUrl = 'https://api.sendgrid.com/v3/templates/' + conf.templateId;
-            var headers = {};
             headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
             kintone.proxy(getUrl, 'GET', headers, {}, function(resp) {
                 resp = JSON.parse(resp);
@@ -186,7 +194,6 @@ jQuery.noConflict();
         //Get templates button function.
         $('#get-template').on('click', function() {
             var url = 'https://api.sendgrid.com/v3/templates';
-            var headers = {};
             headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
             kintone.proxy(url, 'GET', headers, {}, function(resp) {
                 responseTemp = resp;
@@ -234,7 +241,6 @@ jQuery.noConflict();
             }else if (initialFlag === false) {
                 //Get codes in this template
                 var getUrl = 'https://api.sendgrid.com/v3/templates/' + $('#template_select').val();
-                var headers = {};
                 headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
                 kintone.proxy(getUrl, 'GET', headers, {}, function(resp) {
                     resp = JSON.parse(resp);
@@ -258,7 +264,6 @@ jQuery.noConflict();
         //The save button function.
         $('#submit').on('click', function() {
             var config = {};
-            config.sendgridApiKey = $('#sendgrid_apikey').val();
             config.from = $('#from').val();
             config.templateName = $('#template_select').children(':selected').text();
             config.templateId = $('#template_select').val();
@@ -267,22 +272,29 @@ jQuery.noConflict();
             if (!$('#sendgrid_apikey').val() && (userInfo.language === 'ja')) {
                 swal('Error', '必須項目 SendGrid API key が選択されていません。', 'error');
                 return;
-            }else if (!$('#sendgrid_apikey').val() && (userInfo.language === 'en')) {
+            } else if (!$('#sendgrid_apikey').val() && (userInfo.language === 'en')) {
                 swal('Error', 'SendGrid API key is required.', 'error');
                 return;
             }
-            if (!$('#template_select').val() && (userInfo.language === 'ja')) {
-                swal('Error', '必須項目 メールテンプレート名 が選択されていません。', 'error');
+            if (!$('#from').val() && (userInfo.language === 'ja')) {
+                swal('Error', '必須項目 From が入力されていません。', 'error');
                 return;
-            }else if (!$('#template_select').val()) {
-                swal('Error', 'Mail Template is required.', 'error');
+            } else if (!$('#from').val() && (userInfo.language === 'en')) {
+                swal('Error', 'From is required.', 'error');
                 return;
             }
             if (!$('#email_select').val() && (userInfo.language === 'ja')) {
                 swal('Error', '必須項目 Toフィールドが選択されていません。', 'error');
                 return;
-            }else if (!$('#email_select').val()) {
+            } else if (!$('#email_select').val()) {
                 swal('Error', 'To field is required.', 'error');
+                return;
+            }
+            if (!$('#template_select').val() && (userInfo.language === 'ja')) {
+                swal('Error', '必須項目 メールテンプレート名 が選択されていません。', 'error');
+                return;
+            } else if (!$('#template_select').val()) {
+                swal('Error', 'Mail Template is required.', 'error');
                 return;
             }
             // Substitution tag
@@ -297,7 +309,7 @@ jQuery.noConflict();
             var subNumber = 0;
             for (var q = 0; q < subContainer.children().length; q++) {
                 if ($('#sub_tag_variable_' + q).val() !== '' && $('#field_select' + q).val() !== '') {
-                    if ($('#sub_tag_variable_' + q).val().match(/^[a-zA-Z0-9!-/:-@¥[-`¥{-~]+$/) == null) {
+                    if ($('#sub_tag_variable_' + q).val().match(/^[a-zA-Z0-9!-/:-@¥[-`¥{-~]+$/) === null) {
                         var subError = 'Substitution tag must be single byte characters';
                         if (userInfo.language === 'ja') {
                             subError = 'Substitution tagには半角英数のみ使用可能です。';
@@ -311,7 +323,16 @@ jQuery.noConflict();
                 }
             }
             config.subNumber = String(subNumber);
-            kintone.plugin.app.setConfig(config);
+            headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
+            kintone.plugin.app.setConfig(config, function(){
+                kintone.plugin.app.setProxyConfig(
+                    'https://api.sendgrid.com/', 'POST', headers, {}, function() {
+                        kintone.plugin.app.setProxyConfig(
+                            'https://api.sendgrid.com/', 'GET', headers, {}
+                        );
+                    }
+                );
+            });
         });
         //The cancel button function.
         $('#cancel').click(function() {

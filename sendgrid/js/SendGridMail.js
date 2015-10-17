@@ -9,7 +9,6 @@
         var url = 'https://api.sendgrid.com/api/mail.send.json';
         var method = 'POST';
         var headers = {};
-        headers.Authorization = 'Bearer ' + config.sendgridApiKey;
         headers['Content-Type'] = 'application/x-www-form-urlencoded';
         var data =
           'to=' + encodeURIComponent(config.from) +
@@ -74,8 +73,8 @@
         templateSpace.className = 'select-cybozu';
         var url = 'https://api.sendgrid.com/v3/templates';
         var headers = {};
-        headers.Authorization = 'Bearer ' + config.sendgridApiKey;
-        kintone.proxy(url, 'GET', headers, {}, function(resp) {
+        kintone.plugin.app.proxy(
+            PLUGIN_ID, url, 'GET', headers, {}, function(resp, status, obj) {
             var responseTemp = JSON.parse(resp);
             if (responseTemp.templates.length > 0 && responseTemp.errors === undefined) {
                 for (var m = 0; m < responseTemp.templates.length; m++) {
