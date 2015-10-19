@@ -4,6 +4,8 @@
     var config = kintone.plugin.app.getConfig(PLUGIN_ID);
     //User Information
     var userInfo = kintone.getLoginUser();
+    //appId
+    var appId = kintone.app.getId();
     //Send mail function
     function sendMail(smtpapi) {
         var url = 'https://api.sendgrid.com/api/mail.send.json';
@@ -54,6 +56,38 @@
             PLUGIN_ID, url, method, headers, data, callback, errback
         );
     }
+    function getSmtpapi(records, config) {
+        var to = [];
+        var sub = {};
+        for (var j = 0; j < config.subNumber; j++) {
+            sub[config['val'+j]] = [];
+        }
+        for (var i = 0; i < records.length; i++) {
+            to.push(records[i][config.emailFieldCode].value);
+            for (var k = 0; k < config.subNumber; k++) {
+                sub[config['val'+k]].push(records[i][config['code'+k]].value);
+            }
+        }
+        var smtpapi = {};
+        smtpapi.to = to;
+        smtpapi.sub = sub;
+        smtpapi.filters = {};
+        smtpapi.filters.templates = {};
+        smtpapi.filters.templates.settings = {};
+        smtpapi.filters.templates.settings.enable = 1;
+        smtpapi.filters.templates.settings.template_id = $('#temp_select').val();
+        return smtpapi;
+    }
+    function processRecords(appId, condition, limit, offset) {
+        condition = condition + ' limit ' + limit + ' offset ' + offset;
+        kintone.api(
+            '/k/v1/records', 'GET',
+            {app: appId, query: condition},
+            function(resp){
+                sendMail(getSmtpapi(resp.records, config));
+            }
+        );
+    }
     kintone.events.on('app.record.index.show', function(event) {
         if ($('#my_index_button').length > 0) {
             return;
@@ -73,6 +107,7 @@
         templateSpace.className = 'select-cybozu';
         var url = 'https://api.sendgrid.com/v3/templates';
         var headers = {};
+        headers['Content-Type'] = 'application/json';
         kintone.plugin.app.proxy(
             PLUGIN_ID, url, 'GET', headers, {}, function(resp, status, obj) {
             var responseTemp = JSON.parse(resp);
@@ -116,7 +151,7 @@
                     cancelButtonText: 'キャンセル',
                     confirmButtonColor: '#DD6B55',
                     confirmButtonText: '送信',
-                    closeOnConfirm: false
+                    closeOnConfirm: true
                 };
             }else {
                 swalContent = {
@@ -125,7 +160,7 @@
                     showCancelButton: true,
                     confirmButtonColor: '#DD6B55',
                     confirmButtonText: 'Send',
-                    closeOnConfirm: false
+                    closeOnConfirm: true
                 };
             }
             swal(swalContent, function() {
@@ -137,28 +172,20 @@
                     }
                     return;
                 }else {
-                    // Smtpapi
-                    var to = [];
-                    var sub = {};
-                    for (var j = 0; j < config.subNumber; j++) {
-                        sub[config['val'+j]] = [];
-                    }
-                    for (var i = 0; i < records.length; i++) {
-                        to.push(records[i][config.emailFieldCode].value);
-                        for (var k = 0; k < config.subNumber; k++) {
-                            sub[config['val'+k]].push(records[i][config['code'+k]].value);
+                    var condition= kintone.app.getQueryCondition();
+                    kintone.api(
+                        '/k/v1/records', 'GET',
+                        {app: appId, query: condition, totalCount: true},
+                        function(resp){
+                            var limit = 500;
+                            var reqNums = Math.ceil(resp.totalCount / limit);
+                            for (var i = 0; i < reqNums; i++) {
+                                var offset = i * limit;
+                                var condition= kintone.app.getQueryCondition();
+                                processRecords(appId, condition, limit, offset);
+                            }
                         }
-                    }
-                    var smtpapi = {};
-                    smtpapi.to = to;
-                    smtpapi.sub = sub;
-                    smtpapi.filters = {};
-                    smtpapi.filters.templates = {};
-                    smtpapi.filters.templates.settings = {};
-                    smtpapi.filters.templates.settings.enable = 1;
-                    smtpapi.filters.templates.settings.template_id = $('#temp_select').val();
-                    // SendMail
-                    sendMail(smtpapi);
+                    );
                 }
             });
         }, false);
