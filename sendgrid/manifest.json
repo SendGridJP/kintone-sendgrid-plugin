@@ -1,6 +1,6 @@
 {
     "manifest_version": 1,
-    "version": 1,
+    "version": 2,
     "type": "APP",
     "name": {
         "ja": "SendGrid plug-in",
@@ -8,9 +8,9 @@
         "zh": "SendGrid plug-in"
     },
     "description": {
-        "ja": "SendGrid can send Email.",
-        "en": "SendGrid can send Email.",
-        "zh": "SendGrid can send Email."
+        "ja": "kintoneからSendGrid経由でメールを送信するプラグインです。",
+        "en": "This plug-in enables kintone to send emails through SendGrid.",
+        "zh": "This plug-in enables kintone to send emails through SendGrid."
     },
     "icon": "image/image.png",
     "homepage_url": {

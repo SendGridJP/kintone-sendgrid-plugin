@@ -19,7 +19,7 @@
           '&text=' + '　' +    // replace <% text %> in template
           '&html=' + '<div></div>'      // replace <% text %> in template
         ;
-        data = data + '&x-smtpapi=' + JSON.stringify(smtpapi);
+        data = data + '&x-smtpapi=' + encodeURIComponent(JSON.stringify(smtpapi));
         var callback = function(resp, status, obj) {
             if (status === 200) {
                 if (userInfo.language === 'ja') {
