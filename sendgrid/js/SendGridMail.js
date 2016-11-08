@@ -37,13 +37,13 @@
                 if (userInfo.language === 'ja') {
                     swal(
                         'Failed',
-                        'メールの送信リクエストに失敗しました。Status code:' + status,
+                        'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + resp,
                         'error'
                     );
                 }else {
                     swal(
                         'Failed',
-                        'A request for mail sending was failed. Status code:' + status,
+                        'A request for mail sending was failed. Status code:' + status + '. Response:' + resp,
                         'error'
                     );
                 }
