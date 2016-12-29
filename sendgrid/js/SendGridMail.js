@@ -149,7 +149,11 @@
         var buttonEl = document.createElement('button');
         buttonEl.classList.add('header-menu-item');
         buttonEl.classList.add('kintoneplugin-button-normal');
-        buttonEl.textContent = 'Mail Send';
+        if (userInfo.language === 'ja') {
+          buttonEl.textContent = 'メール送信';
+        } else {
+          buttonEl.textContent = 'Mail Send';
+        }
         buttonEl.id = 'my_index_button';
         buttonEl.addEventListener('click', function() {
             var swalContent = '';
