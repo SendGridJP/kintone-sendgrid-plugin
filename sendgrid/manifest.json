@@ -27,7 +27,8 @@
         ],
         "css": [
             "css/51-current-defult.css",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css"
+            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css",
+            "css/sendgrid-design.css"
         ]
     },
     "config": {

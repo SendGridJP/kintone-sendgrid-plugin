@@ -58,3 +58,11 @@ ul.tab li a {
 .kintoneplugin-label {
 	border-bottom: solid 1px #c3c3c3;
 }
+
+.header-menu-item {
+	display: inline-block;
+}
+
+.header-menu-item-middle {
+	vertical-align: middle;
+}

@@ -93,18 +93,24 @@
             return;
         }
         // make label
-        var templateLabel = document.createElement('span');
+        var templateLabel = document.createElement('div');
+        templateLabel.classList.add('header-menu-item');
         if (userInfo.language === 'ja') {
-            templateLabel.textContent = 'テンプレート：';
+            templateLabel.textContent = 'テンプレート';
         } else {
-            templateLabel.textContent = 'Template: ';
+            templateLabel.textContent = 'Template';
         }
         kintone.app.getHeaderMenuSpaceElement('buttonSpace').appendChild(templateLabel);
 
         // make template select
+        var templateOuter = document.createElement('div');
+        templateOuter.classList.add('kintoneplugin-select-outer');
+        templateOuter.classList.add('header-menu-item');
+        templateOuter.classList.add('header-menu-item-middle');
+        var templateDiv = document.createElement('div');
+        templateDiv.classList.add('kintoneplugin-select');
         var templateSpace = document.createElement('select');
         templateSpace.id = 'temp_select';
-        templateSpace.className = 'select-cybozu';
         var url = 'https://api.sendgrid.com/v3/templates';
         var headers = {};
         headers['Content-Type'] = 'application/json';
@@ -134,11 +140,15 @@
                 templateSpace.appendChild(op4);
             }
         });
-        kintone.app.getHeaderMenuSpaceElement().appendChild(templateSpace);
+        templateDiv.appendChild(templateSpace);
+        templateOuter.appendChild(templateDiv);
+        kintone.app.getHeaderMenuSpaceElement().appendChild(templateOuter);
 
         //make buttonEl
         var records = event.records;
         var buttonEl = document.createElement('button');
+        buttonEl.classList.add('header-menu-item');
+        buttonEl.classList.add('kintoneplugin-button-normal');
         buttonEl.textContent = 'Mail Send';
         buttonEl.id = 'my_index_button';
         buttonEl.addEventListener('click', function() {
