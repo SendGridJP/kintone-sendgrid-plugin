@@ -1,108 +1,129 @@
 <div>
-    <Font size = 5><span id="title_label">SendGrid Plugin Settings</span></Font>
-    </br>
-    </br>
-
-    <div class="kintoneplugin-label">
-        <B><span id="auth_sub_title_label">Authentication settings</span></B>
-    </div>
-    <hr>
-    <div class="block">
-        <label class="kintoneplugin-label">
-            <span id ="auth_container_label">API key</span>
-            <span class="kintoneplugin-require">*</span>
-        </label>
-        <div class="kintoneplugin-row">
-            <span id="auth_help_label">Enter the API key provided by SendGrid. </span>
-            <a href="https://sendgrid.com/docs/User_Guide/Settings/api_keys.html" target="_blank">
+    <h1><span id="title_label">SendGrid Plugin Settings</span></h1>
+    <div class="config">
+      <ul class="tab">
+        <li class="active">
+          <a href="#" id="general_settings_label">General Settings</a>
+        </li>
+        <li>
+          <a href="#" id="spot_send_settings_label">Spot send Settings</a>
+        </li>
+        <li>
+          <a href="#" id="marketing_campaigns_settings_label">Marketing Campaigns Settings</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <!-- General settings -->
+        <div class="tab-pain active">
+          <h2><span id="auth_sub_title_label">Authentication settings</span></h2>
+          <!-- API key -->
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-label">
+              <span id="auth_container_label">API key</span>
+              <span class="kintoneplugin-require">*</span>
+            </div>
+            <div class="kintoneplugin-row">
+              <span id="auth_help_label">Enter the API key provided by SendGrid. </span>
+              <a href="https://sendgrid.com/docs/User_Guide/Settings/api_keys.html" target="_blank">
                 <span id ="auth_link">API Key Documentation</span>
-            </a>
+              </a>
+            </div>
+            <div class="kintoneplugin-input-outer">
+              <input type="password" id="sendgrid_apikey" class="kintoneplugin-input-text"></input>
+            </div>
+          </div>
         </div>
-        <div class="kintoneplugin-input-outer">
-            <input type="password" id="sendgrid_apikey" class="kintoneplugin-input-text"></input>
-        </div>
-    </div>
-
-    <div class="kintoneplugin-label">
-        <B><span id="email_sub_title_label">Email settings</span></B>
-    </div>
-    <hr>
-    <div class="block">
-        <label class="kintoneplugin-label">
-            <span id ="email_from_container_label">From</span>
-            <span class="kintoneplugin-require">*</span>
-        </label>
-        <div class="kintoneplugin-row">
-            <span id="email_from_help_label">Enter from email address. </span>
-        </div>
-        <div class="kintoneplugin-input-outer">
-            <input id="from" class="kintoneplugin-input-text"></input>
-        </div>
-    </div>
-    <div class="block">
-        <label class="kintoneplugin-label">
-            <span id ="email_to_container_label">To field</span>
-            <span class="kintoneplugin-require">*</span><br>
-        </label>
-        <div class="kintoneplugin-row">
-            <span id="email_to_help_label">
+        <!-- Spot send settings -->
+        <div class="tab-pain">
+          <h2><span id="email_sub_title_label">Email settings</span></h2>
+          <!-- From -->
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-label">
+              <span id="email_from_container_label">From</span>
+              <span class="kintoneplugin-require">*</span>
+            </div>
+            <div class="kintoneplugin-row">
+              <span id="email_from_help_label">Enter from email address. </span>
+            </div>
+            <div class="kintoneplugin-input-outer">
+              <input id="from" class="kintoneplugin-input-text"></input>
+            </div>
+          </div>
+          <!-- To field -->
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-label">
+              <span id="email_to_container_label">To field</span>
+              <span class="kintoneplugin-require">*</span>
+            </div>
+            <div class="kintoneplugin-row">
+              <span id="email_to_help_label">
                 Enter the field code of the field containing the email address
-            </span>
-        </div>
-        <div class="kintoneplugin-select-outer">
-            <div class="kintoneplugin-select">
+              </span>
+            </div>
+            <div class="kintoneplugin-select-outer">
+              <div class="kintoneplugin-select">
                 <select id="email_select"></select>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>
 
-    <div class="kintoneplugin-label">
-        <B><span id="template_sub_title_label">Template settings</span></B>
-    </div>
-    <hr>
-    <div class="block">
-        <label class="kintoneplugin-label">
-            <span id ="template_container_label">Mail Template</span>
-            <span class="kintoneplugin-require">*</span>
-        </label>
-        <div class="kintoneplugin-row">
-            <span id="template_help_label">
+          <h2><span id="template_sub_title_label">Template settings</span></h2>
+          <!-- Mail Template -->
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-label">
+              <span id ="template_container_label">Default Template</span>
+              <span class="kintoneplugin-require">*</span>
+            </div>
+            <div class="kintoneplugin-row">
+              <span id="template_help_label">
                 Get a list of all the templates and select a template.
-            </span>
-        </div>
-        <div class="button-block" style="float:left;">
-            <button type="button" id="get-template" class="kintoneplugin-button-normal">
-                <span id ="template_get_btn">
-                    Get a list of Templates
-                </span>
-            </button>&nbsp;&nbsp;
-        </div>
-        <div class="kintoneplugin-select-outer">
-            <div class="kintoneplugin-select">
-                <select id="template_select">
-                    <option></option>
-                </select>
+              </span>
             </div>
+            <div class="button-block" style="float:left;">
+              <button type="button" id="get-template" class="kintoneplugin-button-normal">
+                <span id ="template_get_btn">
+                  Get a list of Templates
+                </span>
+              </button>&nbsp;&nbsp;
+            </div>
+            <div class="kintoneplugin-select-outer">
+              <div class="kintoneplugin-select">
+                <select id="template_select">
+                  <option></option>
+                </select>
+              </div>
+            </div>
+            <div class="kintoneplugin-row">
+              TEXT<br />
+              <textarea id="template_result_text" cols="80" rows="10" disabled="true"></textarea>
+            </div>
+            <div class="kintoneplugin-row">
+              HTML<br />
+              <textarea id="template_result_html" cols="80" rows="10" disabled="true"></textarea>
+            </div>
+          </div>
+
+          <h2><span id="optional_sub_title_label">Optional settings</span></h2>
+          <!-- Substitution settings -->
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-label">
+              <span id="sub_sub_title_label">Substitution settings</span>
+            </div>
+            <div id="sub_container"></div>
+            <button type="button" id="add-sub" class="kintoneplugin-button-normal">
+              <span id ="sub_add_btn">Add substitution tag</span>
+            </button>
+          </div>
         </div>
-        <br>
-        <div class="kintoneplugin-row">TEXT</div>
-        <textarea id="template_result_text" cols="80" rows="10" disabled = true ></textarea>
-        <div class="kintoneplugin-row">HTML</div>
-        <textarea id="template_result_html" cols="80" rows="10" disabled = true ></textarea>
+
+        <!-- Marketing Campaigns settings -->
+        <div class="tab-pain">
+          piyo
+        </div>
+      </div>
     </div>
 
-    <div class ="block">
-        <div class="kintoneplugin-label">
-            <B><span id ="sub_sub_title_label">Substitution settings(Optional)</span></B>
-        </div>
-        <hr>
-        <div id="sub_container"></div>
-
-        <button type="button" id="add-sub" class="kintoneplugin-button-normal">
-            <span id ="sub_add_btn">Add substitution tag</span>
-        </button>
-    </div>
-    <div class="block">
+    <div class="kintoneplugin-row">
         <button type="button" id="submit" class="kintoneplugin-button-dialog-ok"><span id ="save_btn">     Save     </span></button>
         <button type="button" id="cancel" class="kintoneplugin-button-dialog-cancel"><span id = "cancel_btn">     Cancel   </span></button>
     </div>

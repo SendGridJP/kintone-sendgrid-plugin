@@ -53,7 +53,10 @@ jQuery.noConflict();
         for (var i = 0; i < resp.properties.length; i++) {
             var code = resp.properties[i].code;
             var label = resp.properties[i].label;
-            if (resp.properties[i].type === 'SINGLE_LINE_TEXT') {
+            if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
+                (resp.properties[i].type === 'LINK' &&
+                resp.properties[i].protocol === 'MAIL'))
+            {
                 var valOption = $('<option/>');
                 valOption.attr('value', code);
                 if (default_code == code) {
@@ -77,6 +80,10 @@ jQuery.noConflict();
         if (userInfo.language === 'ja') {
             $('#title_label').text('SendGrid Plugin 設定画面');
 
+            $('#general_settings_label').text('共通設定');
+            $('#spot_send_settings_label').text('スポット送信設定');
+            $('#marketing_campaigns_settings_label').text('マーケティングキャンペーン送信設定');
+
             $('#auth_sub_title_label').text('認証設定');
             $('#auth_help_label').text('SendGrid のAPI keyを入力してください。詳細は');
             $('#auth_link').text('こちら');
@@ -88,10 +95,11 @@ jQuery.noConflict();
 
             $('#template_sub_title_label').text('テンプレート設定');
             $('#template_get_btn').text('テンプレートの取得');
-            $('#template_container_label').text('メールテンプレート名');
+            $('#template_container_label').text('デフォルトテンプレート');
             $('#template_help_label').text('メールテンプレートを下のボタンから取得後、選択してください。');
 
-            $('#sub_sub_title_label').text('置換設定(オプション)');
+            $('#optional_sub_title_label').text('オプション設定');
+            $('#sub_sub_title_label').text('置換設定');
             $('#sub_add_btn').text('Substitution Tagの追加');
 
             $('#save_btn').text('保存');
@@ -191,6 +199,19 @@ jQuery.noConflict();
             });
             initialFlag = false;
         }
+        // Change tab selection
+        $('.tab>li').on('click', function() {
+          var clicked = $(this).index();
+          //var clickedName = $(this).attr('name');
+          $(this).parent().children().each(function(index, element) {
+            if (index == clicked) $(element).addClass('active');
+            else $(element).removeClass('active');
+          });
+          $('.tab-content').children().each(function(index, element) {
+            if (index == clicked) $(element).addClass('active');
+            else $(element).removeClass('active');
+          });
+        });
         //Get templates button function.
         $('#get-template').on('click', function() {
             var url = 'https://api.sendgrid.com/v3/templates';
