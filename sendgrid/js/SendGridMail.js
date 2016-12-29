@@ -150,9 +150,9 @@
         buttonEl.classList.add('header-menu-item');
         buttonEl.classList.add('kintoneplugin-button-normal');
         if (userInfo.language === 'ja') {
-          buttonEl.textContent = 'メール送信';
+          buttonEl.textContent = 'スポット送信';
         } else {
-          buttonEl.textContent = 'Mail Send';
+          buttonEl.textContent = 'Spot Send';
         }
         buttonEl.id = 'my_index_button';
         buttonEl.addEventListener('click', function() {
