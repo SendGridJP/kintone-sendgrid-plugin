@@ -23,28 +23,30 @@
     var callback = function(resp, status, obj) {
       if (status === 200) {
         if (userInfo.language === 'ja') {
-          swal({title: 'Complete',
-                text: 'メールの送信リクエストに成功しました。',
-                html: true,
-                type: 'success'});
+          swal(
+            'Complete',
+            'メールの送信リクエストに成功しました。',
+            'success'
+          );
         }else {
-          swal({title: 'Complete',
-                text: 'A request for mail sending was success.',
-                html: true,
-                type: 'success'});
+          swal(
+            'Complete',
+            'A request for mail sending was success.',
+            'success'
+          );
         }
       }else {
         if (userInfo.language === 'ja') {
           swal(
-              'Failed',
-              'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + resp,
-              'error'
+            'Failed',
+            'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + resp,
+            'error'
           );
         }else {
           swal(
-              'Failed',
-              'A request for mail sending was failed. Status code:' + status + '. Response:' + resp,
-              'error'
+            'Failed',
+            'A request for mail sending was failed. Status code:' + status + '. Response:' + resp,
+            'error'
           );
         }
       }
@@ -90,15 +92,15 @@
   }
   kintone.events.on('app.record.index.show', function(event) {
     if ($('#my_index_button').length > 0) {
-        return;
+      return;
     }
     // make label
     var templateLabel = document.createElement('div');
     templateLabel.classList.add('header-menu-item');
     if (userInfo.language === 'ja') {
-        templateLabel.textContent = 'テンプレート';
+      templateLabel.textContent = 'テンプレート';
     } else {
-        templateLabel.textContent = 'Template';
+      templateLabel.textContent = 'Template';
     }
     kintone.app.getHeaderMenuSpaceElement('buttonSpace').appendChild(templateLabel);
 
