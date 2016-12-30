@@ -7,48 +7,25 @@
   //appId
   var appId = kintone.app.getId();
   //Send mail function
-  function sendMail(smtpapi) {
-    var url = 'https://api.sendgrid.com/api/mail.send.json';
+  function sendMailV3(param) {
+    var url = 'https://api.sendgrid.com/v3/mail/send';
     var method = 'POST';
     var headers = {};
-    headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    var data =
-      'to=' + encodeURIComponent(config.from) +
-      '&from=' + encodeURIComponent(config.from) +
-      '&subject=' + '　' + // replace <% subject %> in template
-      '&text=' + '　' +    // replace <% text %> in template
-      '&html=' + '<div></div>'      // replace <% text %> in template
-    ;
-    data = data + '&x-smtpapi=' + encodeURIComponent(JSON.stringify(smtpapi));
+    headers['Content-Type'] = 'application/json';
+    var data = JSON.stringify(param);
     var callback = function(resp, status, obj) {
-      if (status === 200) {
+      if (status < 400) {
+        var mesSuccess = 'A request for mail sending was success.';
         if (userInfo.language === 'ja') {
-          swal(
-            'Complete',
-            'メールの送信リクエストに成功しました。',
-            'success'
-          );
-        }else {
-          swal(
-            'Complete',
-            'A request for mail sending was success.',
-            'success'
-          );
+          mesSuccess = 'メールの送信リクエストに成功しました。';
         }
-      }else {
+        swal('Complete', mesSuccess, 'success');
+      } else {
+        var mesFail = 'A request for mail sending was failed. Status code:' + status + '. Response:' + resp;
         if (userInfo.language === 'ja') {
-          swal(
-            'Failed',
-            'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + resp,
-            'error'
-          );
-        }else {
-          swal(
-            'Failed',
-            'A request for mail sending was failed. Status code:' + status + '. Response:' + resp,
-            'error'
-          );
+          mesFail = 'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + resp;
         }
+        swal('Failed', mesFail, 'error');
       }
     };
     var errback = function(e) {
@@ -58,27 +35,23 @@
       PLUGIN_ID, url, method, headers, data, callback, errback
     );
   }
-  function getSmtpapi(records, config) {
-    var to = [];
-    var sub = {};
-    for (var j = 0; j < config.subNumber; j++) {
-      sub[config['val'+j]] = [];
-    }
+  function makeV3Param(records, config) {
+    var param = {};
+    var personalizations = [];
     for (var i = 0; i < records.length; i++) {
-      to.push(records[i][config.emailFieldCode].value);
+      var personalization = {};
+      personalization.to = [];
+      personalization.to.push({'email': records[i][config.emailFieldCode].value});
+      personalization.substitutions = {};
       for (var k = 0; k < config.subNumber; k++) {
-        sub[config['val'+k]].push(records[i][config['code'+k]].value);
+        personalization.substitutions[config['val'+k]] = records[i][config['code'+k]].value;
       }
+      personalizations.push(personalization);
     }
-    var smtpapi = {};
-    smtpapi.to = to;
-    smtpapi.sub = sub;
-    smtpapi.filters = {};
-    smtpapi.filters.templates = {};
-    smtpapi.filters.templates.settings = {};
-    smtpapi.filters.templates.settings.enable = 1;
-    smtpapi.filters.templates.settings.template_id = $('#temp_select').val();
-    return smtpapi;
+    param.personalizations = personalizations;
+    param.from = {'email': config.from};
+    param.template_id = $('#temp_select').val();
+    return param;
   }
   function processRecords(appId, condition, limit, offset) {
     condition = condition + ' limit ' + limit + ' offset ' + offset;
@@ -86,7 +59,7 @@
       '/k/v1/records', 'GET',
       {app: appId, query: condition},
       function(resp){
-        sendMail(getSmtpapi(resp.records, config));
+        sendMailV3(makeV3Param(resp.records, config));
       }
     );
   }
@@ -136,7 +109,7 @@
             }
           }
         }
-      }else {
+      } else {
         var op4 = document.createElement('option');
         op4.textContent = 'Couldn\'t get lists';
         templateSpace.appendChild(op4);
@@ -169,7 +142,7 @@
           confirmButtonText: '送信',
           closeOnConfirm: true
         };
-      }else {
+      } else {
         swalContent = {
           title: 'Are you sure?',
           type: 'warning',
@@ -183,11 +156,11 @@
         if (records.length === 0) {
           if (userInfo.language === 'ja') {
             swal('データがありません', '送信するリストが見つかりません.', 'warning');
-          }else {
+          } else {
             swal('No input data', 'Input data was nothing.', 'warning');
           }
           return;
-        }else {
+        } else {
           var condition= kintone.app.getQueryCondition();
           kintone.api(
             '/k/v1/records', 'GET',
@@ -208,18 +181,12 @@
     kintone.app.getHeaderMenuSpaceElement('buttonSpace').appendChild(buttonEl);
   });
   kintone.events.on('app.record.index.edit.submit', function(event) {
+    var title = 'Before mail will be sending, reloading is required.';
+    var message = 'Reloading is required';
     if (userInfo.language === 'ja') {
-      swal(
-        'メールを送信する前に画面をリロードしてください',
-        'メールリストの反映にはリロードが必要です',
-        'warning'
-      );
-    }else {
-      swal(
-        'Before mail will be sending, reloading is required.',
-        'Reloading is required',
-        'warning'
-      );
+      title = 'メールを送信する前に画面をリロードしてください';
+      message = 'メールリストの反映にはリロードが必要です';
     }
+    swal(title, message, 'warning');
   });
 })(kintone.$PLUGIN_ID);
