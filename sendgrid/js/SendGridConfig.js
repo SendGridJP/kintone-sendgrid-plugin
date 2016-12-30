@@ -96,6 +96,7 @@ jQuery.noConflict();
       $('#template_get_btn').text('テンプレートの取得');
       $('#template_container_label').text('デフォルトテンプレート');
       $('#template_help_label').text('メールテンプレートを下のボタンから取得後、選択してください。');
+      $('#template_edit_label').text('テンプレートを編集');
 
       $('#optional_sub_title_label').text('オプション設定');
       $('#sub_sub_title_label').text('置換設定');

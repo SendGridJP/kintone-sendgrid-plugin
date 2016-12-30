@@ -71,9 +71,9 @@
     var templateLabel = document.createElement('div');
     templateLabel.classList.add('header-menu-item');
     if (userInfo.language === 'ja') {
-      templateLabel.textContent = 'テンプレート';
+      templateLabel.innerHTML = '<a href="https://sendgrid.com/templates" target="_blank">テンプレート</a>';
     } else {
-      templateLabel.textContent = 'Template';
+      templateLabel.innerHTML = '<a href="https://sendgrid.com/templates" target="_blank">Template</a>';
     }
     kintone.app.getHeaderMenuSpaceElement('buttonSpace').appendChild(templateLabel);
 
@@ -147,6 +147,7 @@
           title: 'Are you sure?',
           type: 'warning',
           showCancelButton: true,
+          cancelButtonText: 'cancel',
           confirmButtonColor: '#DD6B55',
           confirmButtonText: 'Send',
           closeOnConfirm: true
