@@ -263,13 +263,14 @@ jQuery.noConflict();
         var getUrl = 'https://api.sendgrid.com/v3/templates/' + $('#template_select').val();
         headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
         kintone.proxy(getUrl, 'GET', headers, {}, function(resp) {
-            resp = JSON.parse(resp);
-            for (var n = 0; n < resp.versions.length; n++) {
-                if (resp.versions[n].active == 1) {
-                    $('#template_result_text').text(resp.versions[n].plain_content);
-                    $('#template_result_html').text(resp.versions[n].html_content);
-                }
+          resp = JSON.parse(resp);
+          for (var n = 0; n < resp.versions.length; n++) {
+            if (resp.versions[n].active == 1) {
+              $('#template_result_subject').text(resp.versions[n].subject);
+              $('#template_result_text').text(resp.versions[n].plain_content);
+              $('#template_result_html').text(resp.versions[n].html_content);
             }
+          }
         });
       }else {
         return;
