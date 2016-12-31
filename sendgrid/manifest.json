@@ -21,13 +21,13 @@
     "desktop": {
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
             "js/SendGridMail.js",
             "js/MarketingCampaigns.js"
         ],
         "css": [
             "css/51-current-defult.css",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
             "css/sendgrid-design.css"
         ]
     },
@@ -35,12 +35,12 @@
         "html": "html/SendGridConfig.html",
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
             "js/SendGridConfig.js"
         ],
         "css": [
             "css/51-current-defult.css",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
             "css/sendgrid-design.css"
 
         ],

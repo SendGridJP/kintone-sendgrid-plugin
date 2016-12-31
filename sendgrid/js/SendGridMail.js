@@ -131,53 +131,47 @@
     }
     buttonEl.id = 'my_index_button';
     buttonEl.addEventListener('click', function() {
-      var swalContent = '';
-      if (userInfo.language === 'ja') {
-        swalContent = {
-          title: 'メールを送信しますか？',
-          type: 'warning',
-          showCancelButton: true,
-          cancelButtonText: 'キャンセル',
-          confirmButtonColor: '#DD6B55',
-          confirmButtonText: '送信',
-          closeOnConfirm: true
-        };
-      } else {
-        swalContent = {
-          title: 'Are you sure?',
-          type: 'warning',
-          showCancelButton: true,
-          cancelButtonText: 'cancel',
-          confirmButtonColor: '#DD6B55',
-          confirmButtonText: 'Send',
-          closeOnConfirm: true
-        };
-      }
-      swal(swalContent, function() {
-        if (records.length === 0) {
-          if (userInfo.language === 'ja') {
-            swal('データがありません', '送信するリストが見つかりません.', 'warning');
-          } else {
-            swal('No input data', 'Input data was nothing.', 'warning');
-          }
-          return;
+      // no records
+      if (records.length === 0) {
+        if (userInfo.language === 'ja') {
+          swal('データがありません', '送信するリストが見つかりません.', 'warning');
         } else {
-          var condition= kintone.app.getQueryCondition();
-          kintone.api(
-            '/k/v1/records', 'GET',
-            {app: appId, query: condition, totalCount: true},
-            function(resp){
-              var limit = 500;
-              var reqNums = Math.ceil(resp.totalCount / limit);
-              for (var i = 0; i < reqNums; i++) {
-                var offset = i * limit;
-                var condition= kintone.app.getQueryCondition();
-                processRecords(appId, condition, limit, offset);
-              }
-            }
-          );
+          swal('No input data', 'Input data was nothing.', 'warning');
         }
-      });
+        return;
+      }
+      // confirm before send
+      var title = 'Are you sure?';
+      var cancelButtonText = 'Cancel';
+      var confirmButtonText = 'Send';
+      if (userInfo.language === 'ja') {
+        title = 'メールを送信しますか？';
+        cancelButtonText = 'キャンセル';
+        confirmButtonText = '送信';
+      }
+      swal({
+        title: title,
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: cancelButtonText,
+      }).then(function() {
+        // send mail
+        var condition= kintone.app.getQueryCondition();
+        kintone.api(
+          '/k/v1/records', 'GET',
+          {app: appId, query: condition, totalCount: true},
+          function(resp){
+            var limit = 500;
+            var reqNums = Math.ceil(resp.totalCount / limit);
+            for (var i = 0; i < reqNums; i++) {
+              var offset = i * limit;
+              var condition= kintone.app.getQueryCondition();
+              processRecords(appId, condition, limit, offset);
+            }
+          }
+        );
+      }).catch(swal.noop);
     }, false);
     kintone.app.getHeaderMenuSpaceElement('buttonSpace').appendChild(buttonEl);
   });
