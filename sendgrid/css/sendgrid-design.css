@@ -66,3 +66,8 @@ ul.tab li a {
 .header-menu-item-middle {
 	vertical-align: middle;
 }
+
+ul.items {
+	list-style: disc;
+	margin: 0 0 0 20px;
+}

@@ -86,6 +86,7 @@ jQuery.noConflict();
       $('#auth_sub_title_label').text('認証設定');
       $('#auth_help_label').text('SendGrid のAPI keyを入力してください。詳細は');
       $('#auth_link').text('こちら');
+      $('#auth_permission_label').text('必要なパーミッション');
 
       $('#email_sub_title_label').text('メール設定');
       $('#email_from_help_label').text('メールの送信元アドレス（from）を入力してください。');
