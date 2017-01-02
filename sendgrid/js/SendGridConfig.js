@@ -81,10 +81,11 @@ jQuery.noConflict();
 
       $('#general_settings_label').text('共通設定');
       $('#spot_send_settings_label').text('スポット送信設定');
-      $('#marketing_campaigns_settings_label').text('マーケティングキャンペーン送信設定');
+      $('#marketing_campaigns_settings_label').text('マーケティングキャンペーン設定');
 
       $('#auth_sub_title_label').text('認証設定');
-      $('#auth_help_label').text('SendGrid のAPI keyを入力してください。詳細は');
+      $('#auth_container_label').text('APIキー');
+      $('#auth_help_label').text('SendGrid のAPIキーを入力してください。詳細は');
       $('#auth_link').text('こちら');
       $('#auth_permission_label').text('必要なパーミッション');
 
@@ -102,6 +103,9 @@ jQuery.noConflict();
       $('#optional_sub_title_label').text('オプション設定');
       $('#sub_sub_title_label').text('置換設定');
       $('#sub_add_btn').text('Substitution Tagの追加');
+
+      $('#mc_use_mc_label1').text('マーケティングキャンペーンを利用する');
+      $('#mc_use_mc_label2').text('マーケティングキャンペーンを利用する');
 
       $('#save_btn').text('保存');
       $('#cancel_btn').text('キャンセル');
