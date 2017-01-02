@@ -48,7 +48,8 @@
             "templateName",
             "templateId",
             "emailFieldCode",
-            "from"
+            "from",
+            "useMc"
         ]
     }
 }

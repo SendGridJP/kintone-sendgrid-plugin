@@ -171,7 +171,9 @@ jQuery.noConflict();
           addSub(conf['val' + k], conf['code' + k], resp);
         }
       });
-    }else {
+      // Display Marketing Campaigns settings
+      $('#use_mc').prop('checked', conf.useMc === 'true');
+    } else {
       //When the first setting.
       kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
         var adArray = [];
@@ -218,8 +220,7 @@ jQuery.noConflict();
       var url = 'https://api.sendgrid.com/v3/templates';
       headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
       kintone.proxy(url, 'GET', headers, {}, function(resp) {
-        responseTemp = resp;
-        responseTemp = JSON.parse(responseTemp);
+        responseTemp = JSON.parse(resp);
         var templateSpace = $('#template_select');
         if (responseTemp.templates.length > 0 && responseTemp.errors === undefined) {
           if (templateSpace[0].childNodes.length > 0) {
@@ -238,7 +239,7 @@ jQuery.noConflict();
               }
             }
           }
-        }else {
+        } else {
           $('#template_select').empty();
           var op4 = $('<option/>');
           op4.text('Couldn\'t get lists');
@@ -246,9 +247,11 @@ jQuery.noConflict();
         }
       });
       if (userInfo.language === 'ja') {
+        $('#template_result_subject').text('テンプレートを選択してください。');
         $('#template_result_text').text('テンプレートを選択してください。');
         $('#template_result_html').text('テンプレートを選択してください。');
-      }else {
+      } else {
+        $('#template_result_subject').text('Select the tmplate.');
         $('#template_result_text').text('Select the tmplate.');
         $('#template_result_html').text('Select the tmplate.');
       }
@@ -256,27 +259,19 @@ jQuery.noConflict();
     });
     //Select tempaltes function.
     $('#template_select').change(function() {
-      if (selectFlag === false) {
-        //First click
-        selectFlag = true;
-        return;
-      }else if (initialFlag === false) {
-        //Get codes in this template
-        var getUrl = 'https://api.sendgrid.com/v3/templates/' + $('#template_select').val();
-        headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
-        kintone.proxy(getUrl, 'GET', headers, {}, function(resp) {
-          resp = JSON.parse(resp);
-          for (var n = 0; n < resp.versions.length; n++) {
-            if (resp.versions[n].active == 1) {
-              $('#template_result_subject').text(resp.versions[n].subject);
-              $('#template_result_text').text(resp.versions[n].plain_content);
-              $('#template_result_html').text(resp.versions[n].html_content);
-            }
+      //Get codes in this template
+      var getUrl = 'https://api.sendgrid.com/v3/templates/' + $('#template_select').val();
+      headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
+      kintone.proxy(getUrl, 'GET', headers, {}, function(resp) {
+        resp = JSON.parse(resp);
+        for (var n = 0; n < resp.versions.length; n++) {
+          if (resp.versions[n].active == 1) {
+            $('#template_result_subject').text(resp.versions[n].subject);
+            $('#template_result_text').text(resp.versions[n].plain_content);
+            $('#template_result_html').text(resp.versions[n].html_content);
           }
-        });
-      }else {
-        return;
-      }
+        }
+      });
     });
     //Select add substitution button.
     $('#add-sub').on('click', function() {
@@ -291,6 +286,7 @@ jQuery.noConflict();
       config.templateName = $('#template_select').children(':selected').text();
       config.templateId = $('#template_select').val();
       config.emailFieldCode = $('#email_select').val();
+      config.useMc = String($('#use_mc').prop('checked'));
       //Required field check
       if (!$('#sendgrid_apikey').val() && (userInfo.language === 'ja')) {
         swal('Error', '必須項目 SendGrid API key が選択されていません。', 'error');
