@@ -141,7 +141,7 @@ jQuery.noConflict();
         for (var n = 0; n < resp.versions.length; n++) {
           if (resp.versions[n].active == 1) {
             $('#template_result_text').text(resp.versions[n].plain_content);
-            $('#template_result_html').text(resp.versions[n].html_content);
+            $('#template_result_iframe').prop('srcdoc', resp.versions[n].html_content);
           }
         }
         opTag.attr('value', resp.id);
@@ -253,11 +253,11 @@ jQuery.noConflict();
       if (userInfo.language === 'ja') {
         $('#template_result_subject').text('テンプレートを選択してください。');
         $('#template_result_text').text('テンプレートを選択してください。');
-        $('#template_result_html').text('テンプレートを選択してください。');
+        $('#template_result_iframe').prop('srcdoc', 'テンプレートを選択してください。');
       } else {
         $('#template_result_subject').text('Select the tmplate.');
         $('#template_result_text').text('Select the tmplate.');
-        $('#template_result_html').text('Select the tmplate.');
+        $('#template_result_iframe').prop('srcdoc', 'Select the tmplate.');
       }
       initialFlag = false;
     });
@@ -272,7 +272,7 @@ jQuery.noConflict();
           if (resp.versions[n].active == 1) {
             $('#template_result_subject').text(resp.versions[n].subject);
             $('#template_result_text').text(resp.versions[n].plain_content);
-            $('#template_result_html').text(resp.versions[n].html_content);
+            $('#template_result_iframe').prop('srcdoc', resp.versions[n].html_content);
           }
         }
       });
