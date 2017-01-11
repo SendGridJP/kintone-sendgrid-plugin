@@ -16,10 +16,7 @@ jQuery.noConflict();
     }
     var subRow = $('<div/>').addClass('childBlock');
     var leftBlock = $('<div/>').addClass('leftblock').attr('style', 'float:left;');
-    var tagLabel =
-      $('<label/>')
-      .addClass('kintoneplugin-label')
-      .text('Substitution Tag');
+    var tagLabel = $('<label/>').addClass('kintoneplugin-label').text('Substitution Tag');
     var tagInput =
       $('<div/>')
       .addClass('kintoneplugin-input-outer')
@@ -33,9 +30,7 @@ jQuery.noConflict();
     subRow.append(leftBlock);
 
     var rightBlock = $('<div/>').addClass('rightblock');
-    var valLabel =
-      $('<label/>')
-      .addClass('kintoneplugin-label');
+    var valLabel = $('<label/>').addClass('kintoneplugin-label');
     var userInfo = kintone.getLoginUser();
     if (userInfo.language === 'ja') {
       valLabel.text('kintoneのフィールド');
@@ -70,6 +65,70 @@ jQuery.noConflict();
     rightBlock.append(valLabel).append($('<br>')).append(valInput);
     subRow.append(rightBlock);
     subContainer.append(subRow);
+  };
+
+  var showKintoneData = function(appId, conf) {
+    kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
+      var adArray = [];
+      var labelArray = [];
+      var selectSpace = $('#email_select');
+
+      var mcFieldContainer = $('#mc_field_settings_container');
+      var mcRowTitle = $('<div/>').addClass('row').addClass('title');
+      mcRowTitle
+        .append($('<div />').addClass('col').text('連携対象'))
+        .append($('<div />').addClass('col').text('フィールド名'))
+        .append($('<div />').addClass('col').text('タイプ'))
+        .append($('<div />').addClass('col').text('フィールドコード'));
+      mcFieldContainer.append(mcRowTitle);
+
+      for (var i = 0; i < resp.properties.length; i++) {
+        if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
+          (resp.properties[i].type === 'LINK' &&
+          resp.properties[i].protocol === 'MAIL'))
+        {
+          var op = $('<option/>');
+          op.attr('value', resp.properties[i].code);
+          if (conf.emailFieldCode === resp.properties[i].code) {
+            op.prop('selected', true);
+          }
+          op.text(
+            resp.properties[i].label + '(' + resp.properties[i].code + ')'
+          );
+          selectSpace.append(op);
+        }
+        if (resp.properties[i].type === 'SINGLE_LINE_TEXT') {
+          adArray.push(resp.properties[i].code);
+          labelArray.push(resp.properties[i].label);
+        }
+        // MC Field Settings
+        console.log(
+          resp.properties[i].label + "|" +
+          resp.properties[i].type + "|" +
+          resp.properties[i].code + "|" +
+          resp.properties[i].unique + "|"
+        );
+        // TODO フィールドごとに連携フラグをもたせようとしたが、
+        // フィールドを一意に特定するIDが存在しないため設定値を保存できないため断念
+        // いずれ可能になったタイミングで検討する。
+        // それまでは、ASCIIフィールドコードを持つ全てのフィールドが連携対象となる。
+        var mcIntCbDiv = $('<div />').addClass('kintoneplugin-input-checkbox');
+        var mcIntCbItemDiv = $('<div />').addClass('kintoneplugin-input-checkbox-item');
+        var mcIntCbInput = $('<input />')
+          .attr('id', '');
+
+        var mcRow = $('<div />').addClass('row');
+        mcRow
+          .append($('<div />').addClass('col').text(''))
+          .append($('<div />').addClass('col').text(resp.properties[i].label))
+          .append($('<div />').addClass('col').text(resp.properties[i].type))
+          .append($('<div />').addClass('col').text(resp.properties[i].code));
+        mcFieldContainer.append(mcRow);
+      }
+      for (var k = 0; k < conf.subNumber; k++) {
+        addSub(conf['val' + k], conf['code' + k], resp);
+      }
+    });
   };
 
   //get appId
@@ -107,6 +166,8 @@ jQuery.noConflict();
       $('#mc_use_mc_label1').text('マーケティングキャンペーンを利用する');
       $('#mc_use_mc_label2').text('マーケティングキャンペーンを利用する');
 
+      $('#mc_field_settings_label').text('フィールド連携設定');
+
       $('#save_btn').text('保存');
       $('#cancel_btn').text('キャンセル');
     }
@@ -115,6 +176,7 @@ jQuery.noConflict();
     var appId = kintone.app.getId();
     //Get existing data.
     if (Object.keys(conf).length > 0) {
+      // Show saved data
       var cg = kintone.plugin.app.getProxyConfig(
         'https://api.sendgrid.com/', 'POST'
       );
@@ -146,64 +208,14 @@ jQuery.noConflict();
         }
         opTag.attr('value', resp.id);
       });
-      //Display existing data.
-      kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
-        var adArray = [];
-        var labelArray = [];
-        var selectSpace = $('#email_select');
-        for (var i = 0; i < resp.properties.length; i++) {
-          if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
-            (resp.properties[i].type === 'LINK' &&
-            resp.properties[i].protocol === 'MAIL'))
-          {
-            var op = $('<option/>');
-            op.attr('value', resp.properties[i].code);
-            if (conf.emailFieldCode === resp.properties[i].code) {
-              op.prop('selected', true);
-            }
-            op.text(resp.properties[i].label +
-              '(' + resp.properties[i].code + ')'
-            );
-            selectSpace.append(op);
-          }
-          if (resp.properties[i].type === 'SINGLE_LINE_TEXT') {
-            adArray.push(resp.properties[i].code);
-            labelArray.push(resp.properties[i].label);
-          }
-        }
-        for (var k = 0; k < conf.subNumber; k++) {
-          addSub(conf['val' + k], conf['code' + k], resp);
-        }
-      });
+      // Show kintone data
+      showKintoneData(appId, conf);
       // Display Marketing Campaigns settings
       $('#use_mc').prop('checked', conf.useMc === 'true');
     } else {
-      //When the first setting.
-      kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
-        var adArray = [];
-        var labelArray = [];
-        var selectSpace = $('#email_select');
-        for (var i = 0; i < resp.properties.length; i++) {
-          if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
-            (resp.properties[i].type === 'LINK' &&
-            resp.properties[i].protocol === 'MAIL'))
-          {
-            var op = $('<option/>');
-            op.attr('value', resp.properties[i].code);
-            op.text(
-              resp.properties[i].label + '(' + resp.properties[i].code + ')'
-            );
-            selectSpace.append(op);
-          }
-          if (resp.properties[i].type === 'SINGLE_LINE_TEXT') {
-            adArray.push(resp.properties[i].code);
-            labelArray.push(resp.properties[i].label);
-          }
-        }
-        for (var k = 0; k < conf.subNumber; k++) {
-          addSub(conf['code' + k], conf['val' + k], resp);
-        }
-      });
+      // First settings
+      // Show kintone data
+      showKintoneData(appId, conf);
       initialFlag = false;
     }
     // Change tab selection
