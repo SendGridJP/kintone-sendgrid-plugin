@@ -72,16 +72,6 @@ jQuery.noConflict();
       var adArray = [];
       var labelArray = [];
       var selectSpace = $('#email_select');
-
-      var mcFieldContainer = $('#mc_field_settings_container');
-      var mcRowTitle = $('<div/>').addClass('row').addClass('title');
-      mcRowTitle
-        .append($('<div />').addClass('col').text('連携対象'))
-        .append($('<div />').addClass('col').text('フィールド名'))
-        .append($('<div />').addClass('col').text('タイプ'))
-        .append($('<div />').addClass('col').text('フィールドコード'));
-      mcFieldContainer.append(mcRowTitle);
-
       for (var i = 0; i < resp.properties.length; i++) {
         if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
           (resp.properties[i].type === 'LINK' &&
@@ -101,29 +91,6 @@ jQuery.noConflict();
           adArray.push(resp.properties[i].code);
           labelArray.push(resp.properties[i].label);
         }
-        // MC Field Settings
-        console.log(
-          resp.properties[i].label + "|" +
-          resp.properties[i].type + "|" +
-          resp.properties[i].code + "|" +
-          resp.properties[i].unique + "|"
-        );
-        // TODO フィールドごとに連携フラグをもたせようとしたが、
-        // フィールドを一意に特定するIDが存在しないため設定値を保存できないため断念
-        // いずれ可能になったタイミングで検討する。
-        // それまでは、ASCIIフィールドコードを持つ全てのフィールドが連携対象となる。
-        var mcIntCbDiv = $('<div />').addClass('kintoneplugin-input-checkbox');
-        var mcIntCbItemDiv = $('<div />').addClass('kintoneplugin-input-checkbox-item');
-        var mcIntCbInput = $('<input />')
-          .attr('id', '');
-
-        var mcRow = $('<div />').addClass('row');
-        mcRow
-          .append($('<div />').addClass('col').text(''))
-          .append($('<div />').addClass('col').text(resp.properties[i].label))
-          .append($('<div />').addClass('col').text(resp.properties[i].type))
-          .append($('<div />').addClass('col').text(resp.properties[i].code));
-        mcFieldContainer.append(mcRow);
       }
       for (var k = 0; k < conf.subNumber; k++) {
         addSub(conf['val' + k], conf['code' + k], resp);
@@ -165,8 +132,6 @@ jQuery.noConflict();
 
       $('#mc_use_mc_label1').text('マーケティングキャンペーンを利用する');
       $('#mc_use_mc_label2').text('マーケティングキャンペーンを利用する');
-
-      $('#mc_field_settings_label').text('フィールド連携設定');
 
       $('#save_btn').text('保存');
       $('#cancel_btn').text('キャンセル');
