@@ -28,7 +28,8 @@
         "css": [
             "css/51-current-defult.css",
             "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
-            "css/sendgrid-design.css"
+            "css/sendgrid-design.css",
+            "https://fonts.googleapis.com/icon?family=Material+Icons"
         ]
     },
     "config": {

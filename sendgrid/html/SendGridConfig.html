@@ -36,6 +36,7 @@
           <div class="kintoneplugin-input-outer">
             <input type="password" id="sendgrid_apikey" class="kintoneplugin-input-text"></input>
           </div>
+          <div class="kintoneplugin-alert" id="sendgrid_apikey_alert" style="display: none"></div>
         </div>
       </div>
       <!-- Spot send settings -->
@@ -99,6 +100,7 @@
               </select>
             </div>
           </div>
+          <div class="kintoneplugin-alert" id="template_select_alert"></div>
           <div class="kintoneplugin-row">
             <strong>Subject</strong><br />
             <div id="template_result_subject"></div>
@@ -141,6 +143,33 @@
                 <label id="mc_use_mc_label2" for="use_mc">Use Marketing Campaigns</label>
               </span>
             </div>
+          </div>
+        </div>
+        <!-- Field settings -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="mc_field_settings_label">Field Settings</span>
+          </div>
+          <div class="table" id="mc_field_settings_container">
+            <!-- <div class="row title">
+              <div class="col">連携対象</div>
+              <div class="col">フィールド名</div>
+              <div class="col">タイプ</div>
+              <div class="col">フィールドコード</div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="kintoneplugin-input-checkbox">
+                  <div class="kintoneplugin-input-checkbox-item">
+                    <input type="checkbox" name="hoge" id="mc_int">
+                    <label id="hoge" for="mc_int"></label>
+                  </div>
+                </div>
+              </div>
+              <div class="col">会社名</div>
+              <div class="col">SINGLE_LINE_TEXT</div>
+              <div class="col">文字列__1行_</div>
+            </div> -->
           </div>
         </div>
       </div>
