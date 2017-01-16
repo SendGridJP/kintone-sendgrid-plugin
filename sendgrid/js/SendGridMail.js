@@ -160,7 +160,7 @@ jQuery.noConflict();
       personalizations.push(personalization);
     }
     param.personalizations = personalizations;
-    param.from = {'email': config.from};
+    param.from = {'email': config.from, 'name': config.fromName};
     param.template_id = $('#temp_select').val();
     return param;
   }

@@ -27,6 +27,8 @@ jQuery.noConflict();
 
       $('#email_sub_title_label').text('メール設定');
       $('#email_from_help_label').text('メールの送信元アドレス（from）を入力してください。');
+      $('#email_from_name_container_label').text('From表示名');
+      $('#email_from_name_help_label').text('From表示名を入力してください。');
       $('#email_to_container_label').text('Toフィールド');
       $('#email_to_help_label').text('文字列(1行)フィールドかEmailに設定したリンクフィールドより選択してください。');
 
@@ -69,6 +71,8 @@ jQuery.noConflict();
       }
       // from
       $('#from').val(config.from);
+      // from name
+      $('#from_name').val(config.fromName);
       // Template
       refreshTemplatesSpace();
       // Show kintone data
@@ -138,6 +142,7 @@ jQuery.noConflict();
           // Save app config
           var saveConfig = {};
           saveConfig.from = $('#from').val();
+          saveConfig.fromName = $('#from_name').val();
           saveConfig.templateName = $('#template_select').children(':selected').text();
           saveConfig.templateId = $('#template_select').val();
           saveConfig.emailFieldCode = $('#email_select').val();
