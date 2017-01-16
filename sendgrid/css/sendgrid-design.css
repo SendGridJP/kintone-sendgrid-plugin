@@ -133,3 +133,11 @@ ul.items {
 .vertical-align-middle {
   vertical-align: middle;
 }
+
+.kintoneplugin-alert p {
+  word-break: break-all;
+}
+
+.swal2-content {
+	word-break: break-all;
+}

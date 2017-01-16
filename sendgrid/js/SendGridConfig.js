@@ -136,9 +136,10 @@ jQuery.noConflict();
         return;
       }
       // Validate API key
+      var apiKeyAlert = $('#sendgrid_apikey_alert');
       validateApiKey()
         .then(function() {
-          $('#sendgrid_apikey_alert').empty();
+          apiKeyAlert.empty().hide();
           // Save app config
           var saveConfig = {};
           saveConfig.from = $('#from').val();
@@ -185,7 +186,9 @@ jQuery.noConflict();
           });
         })
         .catch(function(reason) {
+          apiKeyAlert.empty().hide();
           var text = isJa() ? 'APIキーの確認に失敗しました。 ' : 'API validate failed. ';
+          swal('Error', text + reason, 'error');
           $('#sendgrid_apikey_alert')
             .append($('<p />', {text: text + reason}))
             .show();
