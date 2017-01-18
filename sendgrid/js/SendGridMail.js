@@ -79,8 +79,8 @@ jQuery.noConflict();
     $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(sendButton);
 
     // Send Mail
-    if (records.length > 0) {
-      $('#send_mail').on('click', function() {
+    $('#send_mail').on('click', function() {
+      if (records.length > 0) {
         // confirm before send
         var title = 'Are you sure?';
         var cancelButtonText = 'Cancel';
@@ -113,8 +113,8 @@ jQuery.noConflict();
             }
           );
         }).catch(swal.noop);
-      });
-    }
+      }
+    });
   });
 
   // Get Templates
