@@ -45,6 +45,8 @@ jQuery.noConflict();
       $('#mc_use_mc_label1').text('マーケティングキャンペーンを利用する');
       $('#mc_use_mc_label2').text('マーケティングキャンペーンを利用する');
 
+      $('#mc_field_settings_label').text('フィールド連携設定');
+
       $('#save_btn').text('保存');
       $('#cancel_btn').text('キャンセル');
     }
@@ -297,35 +299,106 @@ jQuery.noConflict();
     });
   }
 
-  function showKintoneData() {
-    kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
-      var adArray = [];
-      var labelArray = [];
-      var selectSpace = $('#email_select');
-      for (var i = 0; i < resp.properties.length; i++) {
-        if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
-          (resp.properties[i].type === 'LINK' &&
-          resp.properties[i].protocol === 'MAIL'))
-        {
-          var op = $('<option/>');
-          op.attr('value', resp.properties[i].code);
-          if (config.emailFieldCode === resp.properties[i].code) {
-            op.prop('selected', true);
-          }
-          op.text(
-            resp.properties[i].label + '(' + resp.properties[i].code + ')'
-          );
-          selectSpace.append(op);
-        }
-        if (resp.properties[i].type === 'SINGLE_LINE_TEXT') {
-          adArray.push(resp.properties[i].code);
-          labelArray.push(resp.properties[i].label);
-        }
-      }
-      for (var k = 0; k < config.subNumber; k++) {
-        addSub(config['val' + k], config['code' + k], resp);
-      }
+  function getKintoneFields() {
+    return kintone.api('/k/v1/form', 'GET', {app: appId}).then(function(resp) {
+      return resp;
     });
+  }
+
+  function showKintoneData() {
+    return getSendGridFields().then(function(sgFields) {
+      return getKintoneFields().then(function(resp) {
+        // console.log('getKintoneFields(): ' + JSON.stringify(resp));
+        var adArray = [];
+        var labelArray = [];
+        var selectSpace = $('#email_select');
+        var mcFieldContainer = $('#mc_field_settings_container');
+        var knFields = resp.properties;
+
+        for (var i = 0; i < knFields.length; i++) {
+          if (knFields[i].type === 'SINGLE_LINE_TEXT' ||
+            (knFields[i].type === 'LINK' &&
+            knFields[i].protocol === 'MAIL'))
+          {
+            var op = $('<option/>');
+            op.attr('value', knFields[i].code);
+            if (config.emailFieldCode === knFields[i].code) {
+              op.prop('selected', true);
+            }
+            op.text(
+              knFields[i].label + '(' + knFields[i].code + ')'
+            );
+            selectSpace.append(op);
+          }
+          if (knFields[i].type === 'SINGLE_LINE_TEXT') {
+            adArray.push(knFields[i].code);
+            labelArray.push(knFields[i].label);
+          }
+          // MC Field Settings
+          // console.log(
+          //   knFields[i].label + "|" +
+          //   knFields[i].type + "|" +
+          //   knFields[i].code + "|" +
+          //   knFields[i].unique + "|"
+          // );
+          var matchSgFieldName = '';
+          var matchSgFieldType = '';
+          var isTypeMatch = false;
+          for (var j = 0; j < sgFields.length; j++) {
+            if (knFields[i].code === sgFields[j].name) {
+              isTypeMatch = matchFieldType(knFields[i].type, sgFields[j].type);
+              if (isTypeMatch) {
+                matchSgFieldName = sgFields[j].name;
+                matchSgFieldType = sgFields[j].type;
+                break;
+              }
+            }
+          }
+          var mcTr = $('<tr />');
+          mcTr
+            .append($('<td />').text(knFields[i].label + '(' + knFields[i].code + ')'))
+            .append($('<td />').text(knFields[i].type))
+            .append($('<td />').addClass('center').text(isTypeMatch ? '◯' : ''))
+            .append($('<td />').text(matchSgFieldName))
+            .append($('<td />').text(matchSgFieldType));
+          mcFieldContainer.append(mcTr);
+        }
+        for (var k = 0; k < config.subNumber; k++) {
+          addSub(config['val' + k], config['code' + k], resp);
+        }
+      });
+    });
+  }
+
+  function matchFieldType(knFieldType, sgFieldType) {
+    // .log('matchFieldType: ' + knFieldType + ', ' + sgFieldType);
+    var match = {
+      'CHECK_BOX': [],
+      'SUBTABLE': [],
+      'DROP_DOWN': [],
+      'USER_SELECT': [],
+      'RADIO_BUTTON': [],
+      'RICH_TEXT': ['text'],
+      'LINK': ['text'],
+      'RECORD_NUMBER': ['number'],
+      'REFERENCE_TABLE': [],
+      'CALC': [],
+      'MODIFIER': ['text'],
+      'UPDATED_TIME': ['date'],
+      'CREATOR': ['text'],
+      'CREATED_TIME': ['date'],
+      'TIME': ['date'],
+      'NUMBER': ['number'],
+      'FILE': [],
+      'DATETIME': ['date'],
+      'DATE': ['date'],
+      'MULTI_SELECT': [''],
+      'SINGLE_LINE_TEXT': ['text'],
+      'MULTI_LINE_TEXT': ['text']
+    };
+    var ret = (match[knFieldType].length > 0 && $.inArray(sgFieldType, match[knFieldType]) >= 0);
+    // console.log('matchFieldType: ' + ret);
+    return ret;
   }
 
   function addSub(default_val, default_code, resp) {
@@ -384,5 +457,38 @@ jQuery.noConflict();
     rightBlock.append(valLabel).append($('<br>')).append(valInput);
     subRow.append(rightBlock);
     subContainer.append(subRow);
+  }
+
+  function getSendGridFields() {
+    return getReservedFields().then(function(fields) {
+      return getCustomFields(fields).then(function(fields) {
+        // console.log('getSendGridFields: ' + JSON.stringify(fields));
+        return fields;
+      });
+    });
+  }
+
+  // Get Reserved Fields
+  function getReservedFields() {
+    var url = 'https://api.sendgrid.com/v3/contactdb/reserved_fields';
+    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
+      // console.log('getReservedFields: ' + resp[0]);
+      return JSON.parse(resp[0]).reserved_fields;
+    }, function(e) {
+      swal('Failed', 'Mail sending was failed.', 'error');
+      return e;
+    });
+  }
+
+  // Get Custom Fields
+  function getCustomFields(fields) {
+    var url = 'https://api.sendgrid.com/v3/contactdb/custom_fields';
+    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
+      // console.log('getCustomFields: ' + resp[0]);
+      return fields.concat(JSON.parse(resp[0]).custom_fields);
+    }, function(e) {
+      swal('Failed', 'Mail sending was failed.', 'error');
+      return e;
+    });
   }
 })(jQuery, kintone.$PLUGIN_ID);
