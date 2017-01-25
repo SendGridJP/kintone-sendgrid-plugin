@@ -375,19 +375,19 @@ jQuery.noConflict();
     var match = {
       'CHECK_BOX': [],
       'SUBTABLE': [],
-      'DROP_DOWN': [],
+      'DROP_DOWN': ['text'],
       'USER_SELECT': [],
-      'RADIO_BUTTON': [],
+      'RADIO_BUTTON': ['text'],
       'RICH_TEXT': ['text'],
       'LINK': ['text'],
       'RECORD_NUMBER': ['number'],
       'REFERENCE_TABLE': [],
-      'CALC': [],
-      'MODIFIER': ['text'],
+      'CALC': ['number'],
+      'MODIFIER': [],
       'UPDATED_TIME': ['date'],
-      'CREATOR': ['text'],
+      'CREATOR': [],
       'CREATED_TIME': ['date'],
-      'TIME': ['date'],
+      'TIME': ['text'],
       'NUMBER': ['number'],
       'FILE': [],
       'DATETIME': ['date'],
@@ -396,7 +396,7 @@ jQuery.noConflict();
       'SINGLE_LINE_TEXT': ['text'],
       'MULTI_LINE_TEXT': ['text']
     };
-    var ret = (match[knFieldType].length > 0 && $.inArray(sgFieldType, match[knFieldType]) >= 0);
+    var ret = (knFieldType in match && $.inArray(sgFieldType, match[knFieldType]) >= 0);
     // console.log('matchFieldType: ' + ret);
     return ret;
   }
