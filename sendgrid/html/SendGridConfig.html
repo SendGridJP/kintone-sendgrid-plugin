@@ -1,15 +1,12 @@
 <div>
-  <h1><span id="title_label">SendGrid Plugin Settings</span></h1>
+  <h1><span id="title_label">SendGrid Plug-in Settings</span></h1>
   <div class="config">
     <ul class="tab">
       <li class="active">
         <a href="#" id="general_settings_label">General Settings</a>
       </li>
       <li>
-        <a href="#" id="spot_send_settings_label">Spot send Settings</a>
-      </li>
-      <li>
-        <a href="#" id="marketing_campaigns_settings_label">Marketing Campaigns Settings</a>
+        <a href="#" id="spot_send_settings_label">Send Settings</a>
       </li>
     </ul>
     <div class="tab-content">
@@ -138,48 +135,6 @@
             <span id ="sub_add_btn">Add substitution tag</span>
           </button>
         </div>
-      </div>
-
-      <!-- Marketing Campaigns settings -->
-      <div class="tab-pain">
-        <!-- Use Marketing Campaigns -->
-        <div class="kintoneplugin-row">
-          <div class="kintoneplugin-label">
-            <span id="mc_use_mc_label1">Use Marketing Campaigns</span>
-            <span class="kintoneplugin-require">*</span>
-          </div>
-          <div class="kintoneplugin-row">
-            <div class="kintoneplugin-input-checkbox">
-              <span class="kintoneplugin-input-checkbox-item">
-                <input type="checkbox" name="checkbox" id="use_mc">
-                <label id="mc_use_mc_label2" for="use_mc">Use Marketing Campaigns</label>
-              </span>
-            </div>
-          </div>
-        </div>
-        <!-- Field settings -->
-        <div class="kintoneplugin-row">
-          <div class="kintoneplugin-label">
-            <span id="mc_field_settings_label">Field Settings</span>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th colspan="2">kintone</th>
-                <th rowspan="2">連携</th>
-                <th colspan="2">SendGrid</th>
-              </tr>
-              <tr>
-                <th>フィールド名（フィールドコード）</th>
-                <th>タイプ</th>
-                <th>Field Name</th>
-                <th>Type</th>
-              </tr>
-            </thead>
-            <tbody id="mc_field_settings_container">
-            </tbody>
-          </table>
-         </div>
       </div>
     </div>
   </div>

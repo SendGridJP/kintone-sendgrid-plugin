@@ -3,9 +3,9 @@
     "version": 3,
     "type": "APP",
     "name": {
-        "ja": "SendGrid plug-in",
-        "en": "SendGrid plug-in",
-        "zh": "SendGrid plug-in"
+        "ja": "SendGrid プラグイン",
+        "en": "SendGrid Plug-in",
+        "zh": "SendGrid Plug-in"
     },
     "description": {
         "ja": "kintoneからSendGrid経由でメールを送信するプラグインです。",
@@ -22,10 +22,7 @@
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
             "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
-            "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js",
-            "js/SendGridCommon.js",
-            "js/SendGridMail.js",
-            "js/MarketingCampaigns.js"
+            "js/SendGridMail.js"
         ],
         "css": [
             "css/51-current-defult.css",
@@ -39,7 +36,6 @@
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
             "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
-            "js/SendGridCommon.js",
             "js/SendGridConfig.js"
         ],
         "css": [
@@ -52,8 +48,7 @@
             "templateName",
             "templateId",
             "emailFieldCode",
-            "from",
-            "useMc"
+            "from"
         ]
     }
 }

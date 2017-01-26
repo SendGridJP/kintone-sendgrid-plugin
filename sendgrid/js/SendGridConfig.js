@@ -13,11 +13,10 @@ jQuery.noConflict();
   $(document).ready(function() {
     // Translate UI
     if (userInfo.language === 'ja') {
-      $('#title_label').text('SendGrid Plugin 設定画面');
+      $('#title_label').text('SendGrid プラグイン設定画面');
 
       $('#general_settings_label').text('共通設定');
-      $('#spot_send_settings_label').text('スポット送信設定');
-      $('#marketing_campaigns_settings_label').text('マーケティングキャンペーン設定');
+      $('#spot_send_settings_label').text('送信設定');
 
       $('#auth_sub_title_label').text('認証設定');
       $('#auth_container_label').text('APIキー');
@@ -41,11 +40,6 @@ jQuery.noConflict();
       $('#optional_sub_title_label').text('オプション設定');
       $('#sub_sub_title_label').text('置換設定');
       $('#sub_add_btn').text('Substitution Tagの追加');
-
-      $('#mc_use_mc_label1').text('マーケティングキャンペーンを利用する');
-      $('#mc_use_mc_label2').text('マーケティングキャンペーンを利用する');
-
-      $('#mc_field_settings_label').text('フィールド連携設定');
 
       $('#save_btn').text('保存');
       $('#cancel_btn').text('キャンセル');
@@ -79,8 +73,6 @@ jQuery.noConflict();
       refreshTemplatesSpace();
       // Show kintone data
       showKintoneData();
-      // Display Marketing Campaigns settings
-      $('#use_mc').prop('checked', config.useMc === 'true');
     } else {
       // First settings
       // Show kintone data
@@ -149,7 +141,6 @@ jQuery.noConflict();
           saveConfig.templateName = $('#template_select').children(':selected').text();
           saveConfig.templateId = $('#template_select').val();
           saveConfig.emailFieldCode = $('#email_select').val();
-          saveConfig.useMc = String($('#use_mc').prop('checked'));
           if (saveConfig.subNumber === undefined) {
             saveConfig.subNumber = 0;
           }
@@ -213,8 +204,7 @@ jQuery.noConflict();
       }
       if (response.errors === undefined && response.scopes.length > 0) {
         if (($.inArray('mail.send', response.scopes) < 0) ||
-            ($.inArray('templates.read', response.scopes) < 0) ||
-            ($.inArray('marketing_campaigns.update', response.scopes) < 0)) {
+            ($.inArray('templates.read', response.scopes) < 0)) {
           return Promise.reject('Lack of scopes: ' + JSON.stringify(response.scopes));
         }
         return Promise.resolve('success');
@@ -312,7 +302,6 @@ jQuery.noConflict();
         var adArray = [];
         var labelArray = [];
         var selectSpace = $('#email_select');
-        var mcFieldContainer = $('#mc_field_settings_container');
         var knFields = resp.properties;
 
         for (var i = 0; i < knFields.length; i++) {
@@ -334,34 +323,6 @@ jQuery.noConflict();
             adArray.push(knFields[i].code);
             labelArray.push(knFields[i].label);
           }
-          // MC Field Settings
-          // console.log(
-          //   knFields[i].label + "|" +
-          //   knFields[i].type + "|" +
-          //   knFields[i].code + "|" +
-          //   knFields[i].unique + "|"
-          // );
-          var matchSgFieldName = '';
-          var matchSgFieldType = '';
-          var isTypeMatch = false;
-          for (var j = 0; j < sgFields.length; j++) {
-            if (knFields[i].code === sgFields[j].name) {
-              isTypeMatch = SendGrid.matchFieldType(knFields[i].type, sgFields[j].type);
-              if (isTypeMatch) {
-                matchSgFieldName = sgFields[j].name;
-                matchSgFieldType = sgFields[j].type;
-                break;
-              }
-            }
-          }
-          var mcTr = $('<tr />');
-          mcTr
-            .append($('<td />').text(knFields[i].label + '(' + knFields[i].code + ')'))
-            .append($('<td />').text(knFields[i].type))
-            .append($('<td />').addClass('center').text(isTypeMatch ? '◯' : ''))
-            .append($('<td />').text(matchSgFieldName))
-            .append($('<td />').text(matchSgFieldType));
-          mcFieldContainer.append(mcTr);
         }
         for (var k = 0; k < config.subNumber; k++) {
           addSub(config['val' + k], config['code' + k], resp);
