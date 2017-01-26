@@ -31,19 +31,21 @@ jQuery.noConflict();
       // Click Event
       $('#upload_mc').on('click', function() {
         if (records.length > 0) {
-          console.log('click upload_mc');
           // confirm before upload to MC
           var title = 'Are you sure?';
+          var text = 'Upload recipient list to SendGrid Marketing Campaigns?';
           var cancelButtonText = 'Cancel';
           var confirmButtonText = 'Upload';
           if (userInfo.language === 'ja') {
-            title = 'マーケティングキャンペーン機能の宛先リストにアップロードしますか？';
+            title = '確認';
+            text = 'マーケティングキャンペーン機能の宛先リストにアップロードしますか？';
             cancelButtonText = 'キャンセル';
             confirmButtonText = 'アップロード';
           }
           swal({
             title: title,
             type: 'warning',
+            text: text,
             showCancelButton: true,
             confirmButtonText: confirmButtonText,
             cancelButtonText: cancelButtonText,
@@ -66,7 +68,7 @@ jQuery.noConflict();
                 });
               });
             });
-          });
+          }, function() {});
         }
       });
     }
@@ -84,22 +86,21 @@ jQuery.noConflict();
   }
 
   function postRecipients(records, config, sgFields) {
-    console.log('postRecipients: records.length: ' + records.length);
-    console.log('postRecipients: records: ' + JSON.stringify(records));
-    console.log('postRecipients: config: ' + JSON.stringify(config));
-    console.log('postRecipients: sgFields: ' + JSON.stringify(sgFields));
+    // console.log('postRecipients: records.length: ' + records.length);
+    // console.log('postRecipients: records: ' + JSON.stringify(records));
+    // console.log('postRecipients: config: ' + JSON.stringify(config));
+    // console.log('postRecipients: sgFields: ' + JSON.stringify(sgFields));
     var items = [];
     for (var i = 0; i < records.length; i++) {
       var record = records[i];
-      console.log('postRecipients: record: ' + JSON.stringify(record));
+      // console.log('postRecipients: record: ' + JSON.stringify(record));
       var item = {};
       for (var key in record) {
         // Field name must be alphanumeric
         if (key.match(/^[a-zA-Z0-9/_]+$/) !== null) {
           for (var j = 0; j < sgFields.length; j++) {
-            if (sgFields[j].name === key && matchFieldType(record[key].type, sgFields[j].type)) {
+            if ((sgFields[j].name === key) && SendGrid.matchFieldType(record[key].type, sgFields[j].type)) {
               item[key] = convKn2Sg(record[key].type, sgFields[j].type, record[key].value);
-              // item[key] = record[key].value;  // TODO need to convert value
               break;
             }
           }
@@ -107,15 +108,17 @@ jQuery.noConflict();
       }
       items.push(item);
     }
-    console.log('postRecipients: request: ' + JSON.stringify(items));
+    // console.log('postRecipients: request: ' + JSON.stringify(items));
     var url = 'https://api.sendgrid.com/v3/contactdb/recipients';
     var data = JSON.stringify(items);
     return kintone.plugin.app.proxy(PLUGIN_ID, url, 'POST', {}, data).then(function(resp) {
       var response = JSON.parse(resp[0]);
       var status = resp[1];
-      console.log('postRecipients: response: Status code:' + status + '. Response:' + JSON.stringify(response));
+      // console.log('postRecipients: response: Status code:' + status + '. Response:' + JSON.stringify(response));
       if (status == 201 && response.error_count === 0) {
-        return Promise.resolve('success');
+        return swal('Complete', 'おしまい', 'success').then(function(resp) {
+          return Promise.resolve('success');
+        });
       }
       return Promise.reject('post failed: ' + status + ', ' + JSON.stringify(response));
     }, function(e) {
@@ -127,7 +130,7 @@ jQuery.noConflict();
   function getReservedFields() {
     var url = 'https://api.sendgrid.com/v3/contactdb/reserved_fields';
     return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
-      console.log('getReservedFields: ' + resp[0]);
+      // console.log('getReservedFields: ' + resp[0]);
       return JSON.parse(resp[0]).reserved_fields;
     }, function(e) {
       swal('Failed', 'Mail sending was failed.', 'error');
@@ -139,7 +142,7 @@ jQuery.noConflict();
   function getCustomFields(sgFields) {
     var url = 'https://api.sendgrid.com/v3/contactdb/custom_fields';
     return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
-      console.log('getCustomFields: ' + resp[0]);
+      // console.log('getCustomFields: ' + resp[0]);
       return sgFields.concat(JSON.parse(resp[0]).custom_fields);
     }, function(e) {
       swal('Failed', 'Mail sending was failed.', 'error');
@@ -147,50 +150,23 @@ jQuery.noConflict();
     });
   }
 
-  function matchFieldType(knFieldType, sgFieldType) {
-    // console.log('matchFieldType: ' + knFieldType + ', ' + sgFieldType);
-    var match = {
-      'CHECK_BOX': [],
-      'SUBTABLE': [],
-      'DROP_DOWN': ['text'],
-      'USER_SELECT': [],
-      'RADIO_BUTTON': ['text'],
-      'RICH_TEXT': ['text'],
-      'LINK': ['text'],
-      'RECORD_NUMBER': ['number'],
-      'REFERENCE_TABLE': [],
-      'CALC': ['number'],
-      'MODIFIER': [],
-      'UPDATED_TIME': ['date'],
-      'CREATOR': [],
-      'CREATED_TIME': ['date'],
-      'TIME': ['text'],
-      'NUMBER': ['number'],
-      'FILE': [],
-      'DATETIME': ['date'],
-      'DATE': ['date'],
-      'MULTI_SELECT': [''],
-      'SINGLE_LINE_TEXT': ['text'],
-      'MULTI_LINE_TEXT': ['text']
-    };
-    var ret = (knFieldType in match && $.inArray(sgFieldType, match[knFieldType]) >= 0);
-    // console.log('matchFieldType: ' + ret);
-    return ret;
-  }
-
+  // Convert value from kintone to sendgrid
   function convKn2Sg(knType, sgType, knValue) {
-    if (!knValue) return null;
+    // console.log('convKn2Sg: knType: ' + knType + ', sgType: ' + sgType + ', knValue: ' + knValue);
     switch (knType) {
       case 'DATE':
       case 'UPDATED_TIME':
       case 'CREATED_TIME':
       case 'DATETIME':
+        if (!knValue) return null;
         return moment(knValue).format('MM/DD/YYYY');
       case 'RECORD_NUMBER':
       case 'CALC':
       case 'NUMBER':
+        if (!knValue) return null;
         return Number(knValue);
       default:
+        if (!knValue) return "";
         return knValue;
     }
   }

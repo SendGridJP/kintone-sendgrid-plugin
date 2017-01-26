@@ -346,7 +346,7 @@ jQuery.noConflict();
           var isTypeMatch = false;
           for (var j = 0; j < sgFields.length; j++) {
             if (knFields[i].code === sgFields[j].name) {
-              isTypeMatch = matchFieldType(knFields[i].type, sgFields[j].type);
+              isTypeMatch = SendGrid.matchFieldType(knFields[i].type, sgFields[j].type);
               if (isTypeMatch) {
                 matchSgFieldName = sgFields[j].name;
                 matchSgFieldType = sgFields[j].type;
@@ -368,37 +368,6 @@ jQuery.noConflict();
         }
       });
     });
-  }
-
-  function matchFieldType(knFieldType, sgFieldType) {
-    // .log('matchFieldType: ' + knFieldType + ', ' + sgFieldType);
-    var match = {
-      'CHECK_BOX': [],
-      'SUBTABLE': [],
-      'DROP_DOWN': ['text'],
-      'USER_SELECT': [],
-      'RADIO_BUTTON': ['text'],
-      'RICH_TEXT': ['text'],
-      'LINK': ['text'],
-      'RECORD_NUMBER': ['number'],
-      'REFERENCE_TABLE': [],
-      'CALC': ['number'],
-      'MODIFIER': [],
-      'UPDATED_TIME': ['date'],
-      'CREATOR': [],
-      'CREATED_TIME': ['date'],
-      'TIME': ['text'],
-      'NUMBER': ['number'],
-      'FILE': [],
-      'DATETIME': ['date'],
-      'DATE': ['date'],
-      'MULTI_SELECT': [''],
-      'SINGLE_LINE_TEXT': ['text'],
-      'MULTI_LINE_TEXT': ['text']
-    };
-    var ret = (knFieldType in match && $.inArray(sgFieldType, match[knFieldType]) >= 0);
-    // console.log('matchFieldType: ' + ret);
-    return ret;
   }
 
   function addSub(default_val, default_code, resp) {
