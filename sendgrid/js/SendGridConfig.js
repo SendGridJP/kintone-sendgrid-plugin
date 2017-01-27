@@ -296,38 +296,36 @@ jQuery.noConflict();
   }
 
   function showKintoneData() {
-    return getSendGridFields().then(function(sgFields) {
-      return getKintoneFields().then(function(resp) {
-        // console.log('getKintoneFields(): ' + JSON.stringify(resp));
-        var adArray = [];
-        var labelArray = [];
-        var selectSpace = $('#email_select');
-        var knFields = resp.properties;
+    return getKintoneFields().then(function(resp) {
+      // console.log('getKintoneFields(): ' + JSON.stringify(resp));
+      var adArray = [];
+      var labelArray = [];
+      var selectSpace = $('#email_select');
+      var knFields = resp.properties;
 
-        for (var i = 0; i < knFields.length; i++) {
-          if (knFields[i].type === 'SINGLE_LINE_TEXT' ||
-            (knFields[i].type === 'LINK' &&
-            knFields[i].protocol === 'MAIL'))
-          {
-            var op = $('<option/>');
-            op.attr('value', knFields[i].code);
-            if (config.emailFieldCode === knFields[i].code) {
-              op.prop('selected', true);
-            }
-            op.text(
-              knFields[i].label + '(' + knFields[i].code + ')'
-            );
-            selectSpace.append(op);
+      for (var i = 0; i < knFields.length; i++) {
+        if (knFields[i].type === 'SINGLE_LINE_TEXT' ||
+          (knFields[i].type === 'LINK' &&
+          knFields[i].protocol === 'MAIL'))
+        {
+          var op = $('<option/>');
+          op.attr('value', knFields[i].code);
+          if (config.emailFieldCode === knFields[i].code) {
+            op.prop('selected', true);
           }
-          if (knFields[i].type === 'SINGLE_LINE_TEXT') {
-            adArray.push(knFields[i].code);
-            labelArray.push(knFields[i].label);
-          }
+          op.text(
+            knFields[i].label + '(' + knFields[i].code + ')'
+          );
+          selectSpace.append(op);
         }
-        for (var k = 0; k < config.subNumber; k++) {
-          addSub(config['val' + k], config['code' + k], resp);
+        if (knFields[i].type === 'SINGLE_LINE_TEXT') {
+          adArray.push(knFields[i].code);
+          labelArray.push(knFields[i].label);
         }
-      });
+      }
+      for (var k = 0; k < config.subNumber; k++) {
+        addSub(config['val' + k], config['code' + k], resp);
+      }
     });
   }
 
@@ -387,38 +385,5 @@ jQuery.noConflict();
     rightBlock.append(valLabel).append($('<br>')).append(valInput);
     subRow.append(rightBlock);
     subContainer.append(subRow);
-  }
-
-  function getSendGridFields() {
-    return getReservedFields().then(function(fields) {
-      return getCustomFields(fields).then(function(fields) {
-        // console.log('getSendGridFields: ' + JSON.stringify(fields));
-        return fields;
-      });
-    });
-  }
-
-  // Get Reserved Fields
-  function getReservedFields() {
-    var url = 'https://api.sendgrid.com/v3/contactdb/reserved_fields';
-    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
-      // console.log('getReservedFields: ' + resp[0]);
-      return JSON.parse(resp[0]).reserved_fields;
-    }, function(e) {
-      swal('Failed', 'Mail sending was failed.', 'error');
-      return e;
-    });
-  }
-
-  // Get Custom Fields
-  function getCustomFields(fields) {
-    var url = 'https://api.sendgrid.com/v3/contactdb/custom_fields';
-    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
-      // console.log('getCustomFields: ' + resp[0]);
-      return fields.concat(JSON.parse(resp[0]).custom_fields);
-    }, function(e) {
-      swal('Failed', 'Mail sending was failed.', 'error');
-      return e;
-    });
   }
 })(jQuery, kintone.$PLUGIN_ID);

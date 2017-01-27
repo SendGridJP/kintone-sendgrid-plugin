@@ -72,26 +72,6 @@ ul.items {
 	margin: 0 0 0 20px;
 }
 
-/*.table {
-	display:table;
-	width: 100%;
-}
-
-.table>.row {
-	display:table-row;
-}
-
-.table>.title {
-	background-color: #e6e4e4
-}
-
-.table>.row>.col {
-	display: table-cell;
-	margin: 15px;
-	padding: 15px;
-	border: solid 1px #c3c3c3;
-}*/
-
 table {
 	width: 100%;
 }
