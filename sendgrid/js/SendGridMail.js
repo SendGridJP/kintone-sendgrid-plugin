@@ -8,6 +8,10 @@ jQuery.noConflict();
   var userInfo = kintone.getLoginUser();
   //appId
   var appId = kintone.app.getId();
+  // SendMail results
+  var results = [];
+  // SendMail progress
+  var progress = 0;
 
   // Event : Record show
   kintone.events.on('app.record.index.show', function(event) {
@@ -101,52 +105,105 @@ jQuery.noConflict();
           var condition= kintone.app.getQueryCondition();
           kintone.api(
             '/k/v1/records', 'GET',
-            {app: appId, query: condition, totalCount: true},
-            function(resp){
-              var limit = 500;
-              var reqNums = Math.ceil(resp.totalCount / limit);
-              for (var i = 0; i < reqNums; i++) {
-                var offset = i * limit;
-                var condition　= kintone.app.getQueryCondition();
-                processRecords(appId, condition, limit, offset);
-              }
-            }
-          );
+            {app: appId, query: condition, totalCount: true})
+          .then(function(resp) {
+            initSendMail();
+            processRecords(condition, 500, 0, resp.totalCount);
+          });
         }).catch(swal.noop);
       }
     });
+
+    // Progress on HeaderMenuSpace
+    var progress = $('<progress />', {
+      width: '100%',
+      id: 'progress',
+    });
+    progress.hide();
+    $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(progress);
   });
 
-  // Get Templates
-  function getTemplates() {
-    var url = 'https://api.sendgrid.com/v3/templates';
-    return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
-      var response = JSON.parse(resp[0]);
-      if (response.templates.length > 0 && response.errors === undefined) {
-        return response.templates;
-      }
-      console.log('getTemplates: Fail: ' + JSON.stringify(response.errors));
-      return [];
-    }, function(e) {
-      console.log('getTemplates: Fail: ' + JSON.stringify(e));
-      return [];
-    });
+  // Initialize send mail process
+  function initSendMail() {
+    results = [];
+    progress = 0;
+    $('#progress').show();
+  }
+
+  function updateProgress(progress) {
+    $('#progress').attr('value', progress);
+  }
+
+  function finishProgress() {
+    $('#progress').hide();
   }
 
   //　Handle Many Records
-  function processRecords(appId, condition, limit, offset) {
-    condition = condition + ' limit ' + limit + ' offset ' + offset;
-    kintone.api(
-      '/k/v1/records', 'GET',
-      {app: appId, query: condition},
-      function(resp){
-        sendMail(makeParams(resp.records, config));
-      }
-    );
+  function processRecords(condition, limit, offset, total) {
+    var newCondition = condition + ' limit ' + limit + ' offset ' + offset;
+    progress = offset / total;
+    updateProgress(progress);
+    kintone.api('/k/v1/records', 'GET', {app: appId, query: newCondition})
+    .then(function(respKintone){
+      sendMail(makeParams(respKintone.records, config, false))
+      .then(function(respSendMail) {
+        var newOffset = offset + limit;
+        results.push(respSendMail);
+        if (newOffset >= total) {
+          showResults(results);
+        } else {
+          processRecords(condition, limit, newOffset, total);
+        }
+      })
+      .catch(function(respSendMail) {
+        results.push(respSendMail);
+        showResults(results);
+      });
+    })
+    .catch(function(respKintone) {
+      showKintoneError(respKintone);
+      return Promise.reject(respKintone);
+    });
+  }
+
+  function showResults(results) {
+    var mesSuccess = 'A request for mail sending was success.';
+    if (userInfo.language === 'ja') {
+      mesSuccess = 'メールの送信リクエストに成功しました。';
+    }
+    var mesFail = 'A request for mail sending was failed.';
+    if (userInfo.language === 'ja') {
+      mesFail = 'メールの送信リクエストに失敗しました。';
+    }
+    var mesDetail = '';
+    var hasFail = false;
+    for (var i = 0; i < results.length; i++) {
+      var response = results[i][0];
+      var status = results[i][1];
+      mesDetail = mesDetail + '<br />' + response;
+      if (status >= 400) hasFail = true;
+    }
+    if (hasFail) {
+      mesFail = mesFail + '<br />' + mesDetail;
+      swal('Failed', mesFail, 'error').catch(swal.noop);
+    } else {
+      swal('Complete', mesSuccess, 'success').catch(swal.noop);
+    }
+    finishProgress();
+  }
+
+  function showKintoneError(respKintone) {
+    var message = 'Kintone error.';
+    if (userInfo.language === 'ja') {
+      message = 'Kintoneエラー。';
+    }
+    message = message + '<br />status: ' + respKintone.code;
+    message = message + '<br />message: ' + respKintone.message;
+    swal('Failed', message, 'error');
   }
 
   // Make Mail Send Parameters
-  function makeParams(records, config) {
+  function makeParams(records, config, sandbox_mode) {
     var param = {};
     var personalizations = [];
     for (var i = 0; i < records.length; i++) {
@@ -162,35 +219,40 @@ jQuery.noConflict();
     param.personalizations = personalizations;
     param.from = {'email': config.from, 'name': config.fromName};
     param.template_id = $('#temp_select').val();
+    param.mail_settings = {};
+    param.mail_settings.sandbox_mode = {'enable': sandbox_mode};
     return param;
   }
 
   //Send mail function
   function sendMail(param) {
     var url = 'https://api.sendgrid.com/v3/mail/send';
-    var method = 'POST';
     var data = JSON.stringify(param);
-    return kintone.plugin.app.proxy(PLUGIN_ID, url, method, {}, data).then(function(resp) {
+    return kintone.plugin.app.proxy(PLUGIN_ID, url, 'POST', {}, data)
+    .then(function(resp) {
       var response = resp[0];
       var status = resp[1];
-      if (status < 400) {
-        var mesSuccess = 'A request for mail sending was success.';
-        if (userInfo.language === 'ja') {
-          mesSuccess = 'メールの送信リクエストに成功しました。';
-        }
-        swal('Complete', mesSuccess, 'success');
-        return;
-      } else {
-        var mesFail = 'A request for mail sending was failed. Status code:' + status + '. Response:' + response;
-        if (userInfo.language === 'ja') {
-          mesFail = 'メールの送信リクエストに失敗しました。Status code:' + status + '。Response:' + response;
-        }
-        swal('Failed', mesFail, 'error');
-        return;
+      if (status < 400) return resp;
+      else return Promise.reject(resp);
+    })
+    .catch(function(resp) {
+      return Promise.reject(resp);
+    });
+  }
+
+  // Get Templates
+  function getTemplates() {
+    var url = 'https://api.sendgrid.com/v3/templates';
+    return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
+      var response = JSON.parse(resp[0]);
+      if (response.templates.length > 0 && response.errors === undefined) {
+        return response.templates;
       }
+      console.log('getTemplates: Fail: ' + JSON.stringify(response.errors));
+      return [];
     }, function(e) {
-      swal('Failed', 'Mail sending was failed.' + JSON.stringify(e), 'error');
-      return e;
+      console.log('getTemplates: Fail: ' + JSON.stringify(e));
+      return [];
     });
   }
 
