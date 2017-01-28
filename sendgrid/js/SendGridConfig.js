@@ -29,7 +29,7 @@ jQuery.noConflict();
       $('#email_from_name_container_label').text('From表示名');
       $('#email_from_name_help_label').text('From表示名を入力してください。');
       $('#email_to_container_label').text('Toフィールド');
-      $('#email_to_help_label').text('文字列(1行)フィールドかEmailに設定したリンクフィールドより選択してください。');
+      $('#email_to_help_label').text('必須項目かつ値の重複を禁止した「文字列(1行)」フィールドかEmailに設定した「リンク」フィールドより選択してください。');
 
       $('#template_sub_title_label').text('テンプレート設定');
       $('#template_get_btn').text('テンプレートの取得');
@@ -304,9 +304,9 @@ jQuery.noConflict();
       var knFields = resp.properties;
 
       for (var i = 0; i < knFields.length; i++) {
-        if (knFields[i].type === 'SINGLE_LINE_TEXT' ||
-          (knFields[i].type === 'LINK' &&
-          knFields[i].protocol === 'MAIL'))
+        if ((knFields[i].required === 'true' && knFields[i].unique === 'true') &&
+          (knFields[i].type === 'SINGLE_LINE_TEXT' ||
+          (knFields[i].type === 'LINK' && knFields[i].protocol === 'MAIL')))
         {
           var op = $('<option/>');
           op.attr('value', knFields[i].code);
