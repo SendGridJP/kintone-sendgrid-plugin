@@ -12,13 +12,16 @@ This plug-in enables kintone to send Emails through SendGrid.
 ### API Keys
 1. Create an API key on the SendGrid web portal.
 2. Set the API key into the SendGrid plug-in settings.
+  - The API key need the permissions:
+    - mail.send
+    - templates.read
 
 ### Mail settings
 1. Enter the From address into the SendGrid plug-in settings.
-2. Select the kintone field for the To.
+2. Select the kintone field for the To. The To field should be [Text(single-line)] or the [Link(Type is E-mail address)] field which is required and prohibited duplicate values for the recipient address.
 
 ### Template settings
-1. Click the Get a litt of Templates button.
+1. Click the Get a list of Templates button.
 2. Select the default template name.
 
 ### Substitution tags settings (Optional)

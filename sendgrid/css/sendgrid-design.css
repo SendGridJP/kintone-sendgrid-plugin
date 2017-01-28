@@ -7,5 +7,137 @@
 }
 
 .leftblock{
-    margin:0px 150px 0px 0px; 
+    margin:0px 150px 0px 0px;
+}
+
+.config {
+	margin: 20px 0;
+}
+
+ul.tab {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	padding-bottom: 40px;
+	border-bottom: solid 1px #c3c3c3;
+}
+
+ul.tab li {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	padding: 20px 0;
+}
+
+ul.tab li.active {
+	border-left: solid 1px #c3c3c3;
+	border-top: solid 1px #c3c3c3;
+	border-right: solid 1px #c3c3c3;
+	border-bottom: solid 1px white;
+}
+
+ul.tab li a {
+	display: block;
+	text-decoration :none;
+}
+
+.tab-content .tab-pain {
+	display: none;
+	padding: 20px;
+	border-left: solid 1px #c3c3c3;
+	border-right: solid 1px #c3c3c3;
+	border-bottom: solid 1px #c3c3c3;
+}
+.tab-content .tab-pain.active {
+	display: inherit;
+}
+
+.kintoneplugin-label {
+	border-bottom: solid 1px #c3c3c3;
+}
+
+.header-menu-item {
+	display: inline-block;
+}
+
+.header-menu-item-middle {
+	vertical-align: middle;
+}
+
+ul.items {
+	list-style: disc;
+	margin: 0 0 0 20px;
+}
+
+table {
+	width: 100%;
+}
+
+table th {
+	text-align: center;
+	padding: 15px 5px;
+	border: solid 1px #c3c3c3;
+	background-color: #e6e4e4
+}
+
+table td {
+	padding: 15px 5px;
+	border: solid 1px #c3c3c3;
+}
+
+table td.center {
+	text-align: center;
+}
+
+/* Material iconsを利用する */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* 推奨サイズ */
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+
+  /* WebKitブラウザサポート */
+  -webkit-font-smoothing: antialiased;
+  /* Chrome、Safariサポート */
+  text-rendering: optimizeLegibility;
+
+  /* Firefoxサポート */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* IEサポート */
+  font-feature-settings: 'liga';
+}
+
+/* アイコンサイズ */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* 背景が明るいとき用のアイコン色 */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* 背景が暗いとき用のアイコン色 */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+.kintoneplugin-alert p {
+  word-break: break-all;
+}
+
+.swal2-content {
+	word-break: break-all;
 }

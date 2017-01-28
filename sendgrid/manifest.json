@@ -3,9 +3,9 @@
     "version": 3,
     "type": "APP",
     "name": {
-        "ja": "SendGrid plug-in",
-        "en": "SendGrid plug-in",
-        "zh": "SendGrid plug-in"
+        "ja": "SendGrid プラグイン",
+        "en": "SendGrid Plug-in",
+        "zh": "SendGrid Plug-in"
     },
     "description": {
         "ja": "kintoneからSendGrid経由でメールを送信するプラグインです。",
@@ -21,24 +21,26 @@
     "desktop": {
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
             "js/SendGridMail.js"
         ],
         "css": [
-            "css/51-us-default.css",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css"
+            "css/51-current-defult.css",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
+            "css/sendgrid-design.css",
+            "https://fonts.googleapis.com/icon?family=Material+Icons"
         ]
     },
     "config": {
         "html": "html/SendGridConfig.html",
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.min.js",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
             "js/SendGridConfig.js"
         ],
         "css": [
-            "css/51-us-default.css",
-            "https://js.kintone.com/sweetalert/v0.5.0/sweet-alert.css",
+            "css/51-current-defult.css",
+            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
             "css/sendgrid-design.css"
 
         ],
