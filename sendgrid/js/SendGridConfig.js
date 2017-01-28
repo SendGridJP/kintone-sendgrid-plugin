@@ -21,7 +21,8 @@ jQuery.noConflict();
       $('#auth_sub_title_label').text('認証設定');
       $('#auth_container_label').text('APIキー');
       $('#auth_help_label').text('SendGrid のAPIキーを入力してください。詳細は');
-      $('#auth_link').text('こちら');
+      $('#auth_link_label').text('こちら');
+      $('#auth_link').attr('href', 'https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/manage_api_key.html');
       $('#auth_permission_label').text('必要なパーミッション');
 
       $('#email_sub_title_label').text('メール設定');
@@ -297,7 +298,6 @@ jQuery.noConflict();
 
   function showKintoneData() {
     return getKintoneFields().then(function(resp) {
-      // console.log('getKintoneFields(): ' + JSON.stringify(resp));
       var adArray = [];
       var labelArray = [];
       var selectSpace = $('#email_select');
