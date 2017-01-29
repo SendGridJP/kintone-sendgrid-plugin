@@ -1,5 +1,14 @@
 # Change Log
 
+## [4] - 2017/01/30
+- The value for the To field is required and prohibited duplicate values.
+- New design
+- New SendGrid logo
+- Add From name settings
+- Update for Web API v3 for sending email
+- Show subject of the template
+- Add validation for the API key
+
 ## [3] - 2016/11/08
 - Add resp to error message
 
