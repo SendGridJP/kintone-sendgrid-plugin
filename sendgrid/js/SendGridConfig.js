@@ -304,7 +304,7 @@ jQuery.noConflict();
       var knFields = resp.properties;
 
       for (var i = 0; i < knFields.length; i++) {
-        if ((knFields[i].required === 'true' && knFields[i].unique === 'true') &&
+        if (knFields[i].unique === 'true' &&
           (knFields[i].type === 'SINGLE_LINE_TEXT' ||
           (knFields[i].type === 'LINK' && knFields[i].protocol === 'MAIL')))
         {
