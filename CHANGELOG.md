@@ -1,5 +1,8 @@
 # Change Log
 
+## [5] - 2017/03/06
+- Remove required ristriction from To field.
+
 ## [4] - 2017/01/30
 - The value for the To field is required and prohibited duplicate values.
 - New design

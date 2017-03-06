@@ -18,7 +18,7 @@ This plug-in enables kintone to send Emails through SendGrid.
 
 ### Mail settings
 1. Enter the From address into the SendGrid plug-in settings.
-2. Select the kintone field for the To. The To field should be [Text(single-line)] or the [Link(Type is E-mail address)] field which is required and prohibited duplicate values for the recipient address.
+2. Select the kintone field for the To. The To field should be [Text(single-line)] or the [Link(Type is E-mail address)] field which is prohibited duplicate values for the recipient address.
 
 ### Template settings
 1. Click the Get a list of Templates button.

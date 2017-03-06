@@ -207,6 +207,10 @@ jQuery.noConflict();
     var param = {};
     var personalizations = [];
     for (var i = 0; i < records.length; i++) {
+      // Skip the empty recipients
+      if (records[i][config.emailFieldCode].value === '') {
+        continue;
+      }
       var personalization = {};
       personalization.to = [];
       personalization.to.push({'email': records[i][config.emailFieldCode].value});
