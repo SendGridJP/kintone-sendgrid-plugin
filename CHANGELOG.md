@@ -1,5 +1,8 @@
 # Change Log
 
+## [6] - 2017/05/09
+- Remove invalid css selector.
+
 ## [5] - 2017/03/06
 - Remove required ristriction from To field.
 
