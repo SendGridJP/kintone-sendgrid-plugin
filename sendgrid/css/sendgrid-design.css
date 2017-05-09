@@ -72,25 +72,6 @@ ul.items {
 	margin: 0 0 0 20px;
 }
 
-table {
-	width: 100%;
-}
-
-table th {
-	text-align: center;
-	padding: 15px 5px;
-	border: solid 1px #c3c3c3;
-	background-color: #e6e4e4
-}
-
-table td {
-	padding: 15px 5px;
-	border: solid 1px #c3c3c3;
-}
-
-table td.center {
-	text-align: center;
-}
 
 /* Material iconsを利用する */
 .material-icons {
