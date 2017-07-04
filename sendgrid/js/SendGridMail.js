@@ -16,7 +16,7 @@ jQuery.noConflict();
   // Event : Record show
   kintone.events.on('app.record.index.show', function(event) {
     if ($('#send_mail').length > 0) {
-      return;
+      return event;
     }
     // Label on HeaderMenuSpace
     var labelIcon = $('<i />', {
@@ -121,6 +121,7 @@ jQuery.noConflict();
     });
     progress.hide();
     $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(progress);
+    return event;
   });
 
   // Initialize send mail process
@@ -268,5 +269,6 @@ jQuery.noConflict();
       message = 'メールリストの反映にはリロードが必要です';
     }
     swal(title, message, 'warning');
+    return event;
   });
 })(jQuery, kintone.$PLUGIN_ID);
