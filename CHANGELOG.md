@@ -1,5 +1,8 @@
 # Change Log
 
+## [7] - 2017/07/04
+- Returns event object in the event handler.
+
 ## [6] - 2017/05/09
 - Remove invalid css selector.
 
