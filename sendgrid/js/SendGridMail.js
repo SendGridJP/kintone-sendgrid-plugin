@@ -121,6 +121,7 @@ jQuery.noConflict();
     });
     progress.hide();
     $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(progress);
+    return event;
   });
 
   // Initialize send mail process
