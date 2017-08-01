@@ -1,5 +1,8 @@
 # Change Log
 
+## [8] - 2017/08/01
+- Add content type.
+
 ## [7] - 2017/07/04
 - Returns event object in the event handler.
 
