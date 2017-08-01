@@ -226,6 +226,10 @@ jQuery.noConflict();
     param.template_id = $('#temp_select').val();
     param.mail_settings = {};
     param.mail_settings.sandbox_mode = {'enable': sandbox_mode};
+    if (config.contentType === 'text/plain') {
+      param.content = [];
+      param.content.push({'type': 'text/plain', 'value': ' '});
+    }
     return param;
   }
 

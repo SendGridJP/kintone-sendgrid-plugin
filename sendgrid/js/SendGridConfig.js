@@ -32,6 +32,10 @@ jQuery.noConflict();
       $('#email_to_container_label').text('Toフィールド');
       $('#email_to_help_label').text('必須項目かつ値の重複を禁止した「文字列(1行)」フィールドかEmailに設定した「リンク」フィールドより選択してください。');
 
+      $('#content_type_label').text('送信するメール本文のタイプ');
+      $('#content_type_multipart_label').text('マルチパートメール (テキスト+HTML)');
+      $('#content_type_plain_label').text('テキストメール');
+
       $('#template_sub_title_label').text('テンプレート設定');
       $('#template_get_btn').text('テンプレートの取得');
       $('#template_container_label').text('デフォルトテンプレート');
@@ -70,6 +74,13 @@ jQuery.noConflict();
       $('#from').val(config.from);
       // from name
       $('#from_name').val(config.fromName);
+      // Content type
+      if (config.contentType !== 'text/plain') {
+        $('#content_type_multipart').prop('checked', true);
+      } else {
+        $('#content_type_plain').prop('checked', true);
+      }
+
       // Template
       refreshTemplatesSpace();
       // Show kintone data
@@ -139,6 +150,7 @@ jQuery.noConflict();
           var saveConfig = {};
           saveConfig.from = $('#from').val();
           saveConfig.fromName = $('#from_name').val();
+          saveConfig.contentType = $('input[name=content_type]:checked').val();
           saveConfig.templateName = $('#template_select').children(':selected').text();
           saveConfig.templateId = $('#template_select').val();
           saveConfig.emailFieldCode = $('#email_select').val();
