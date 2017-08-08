@@ -30,7 +30,7 @@ jQuery.noConflict();
       $('#email_from_name_container_label').text('From表示名');
       $('#email_from_name_help_label').text('From表示名を入力してください。');
       $('#email_to_container_label').text('Toフィールド');
-      $('#email_to_help_label').text('必須項目かつ値の重複を禁止した「文字列(1行)」フィールドかEmailに設定した「リンク」フィールドより選択してください。');
+      $('#email_to_help_label').text('「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。宛先フィールドは値の重複を禁止する必要があります。');
 
       $('#content_type_label').text('送信するメール本文のタイプ');
       $('#content_type_multipart_label').text('マルチパートメール (テキスト+HTML)');

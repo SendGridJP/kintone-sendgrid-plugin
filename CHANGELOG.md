@@ -1,5 +1,8 @@
 # Change Log
 
+## [9] - 2017/08/08
+- Update settings page description.
+
 ## [8] - 2017/08/01
 - Add content type.
 
