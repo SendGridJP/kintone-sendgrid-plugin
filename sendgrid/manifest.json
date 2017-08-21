@@ -1,6 +1,6 @@
 {
     "manifest_version": 1,
-    "version": 8,
+    "version": 9,
     "type": "APP",
     "name": {
         "ja": "SendGrid プラグイン",
