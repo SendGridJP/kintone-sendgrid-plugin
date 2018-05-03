@@ -1,5 +1,9 @@
 # Change Log
 
+## [10] - 2018/05/03
+- Support duplicate values for the recipient address
+- Support guest space
+
 ## [9] - 2017/08/08
 - Update settings page description.
 

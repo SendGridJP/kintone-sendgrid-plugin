@@ -104,7 +104,7 @@ jQuery.noConflict();
           // send mail
           var condition= kintone.app.getQueryCondition();
           kintone.api(
-            '/k/v1/records', 'GET',
+            kintone.api.url('/k/v1/records', true), 'GET',
             {app: appId, query: condition, totalCount: true})
           .then(function(resp) {
             initSendMail();
@@ -144,7 +144,7 @@ jQuery.noConflict();
     var newCondition = condition + ' limit ' + limit + ' offset ' + offset;
     progress = offset / total;
     updateProgress(progress);
-    kintone.api('/k/v1/records', 'GET', {app: appId, query: newCondition})
+    kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {app: appId, query: newCondition})
     .then(function(respKintone){
       sendMail(makeParams(respKintone.records, config, false))
       .then(function(respSendMail) {
