@@ -3,18 +3,19 @@ kintone SendGrid plug-in
 
 This plug-in enables kintone to send Emails through SendGrid.
 
+## Documentation
+
+See [here](https://sendgridjp.github.io/kintone-sendgrid-plugin/) in Japanese.
+
 ## Usage
 1. Make Email templates in SendGrid. You can use substitution tags in the templates.
 2. Install this plug-in into your environment.
-3. Add this plug-in into kintone apps that you want to use Email.
+3. Add this plug-in into kintone apps that you want to send emails.
 4. Set general settings in the SendGrid plug-in settings.
 
 ### API Keys
 1. Create an API key on the SendGrid web portal.
 2. Set the API key into the SendGrid plug-in settings.
-  - The API key need the permissions:
-    - mail.send
-    - templates.read
 
 ### Mail settings
 1. Enter the From address into the SendGrid plug-in settings.
