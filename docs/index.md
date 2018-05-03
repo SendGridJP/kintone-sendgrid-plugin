@@ -1,7 +1,7 @@
 # SendGrid kintoneプラグインとは
 本プラグインはkintoneからSendGridを利用してメール送信するためのものです。kintone上で管理している顧客リストや会員リストなどに対して、メールを一斉送信できます。
 
-メールのテンプレートはSendGridの[Webポータル](https://sendgrid.com/templates/)上で編集します。メール本文に対して宛先ごとに文字の埋め込み（宛名やクーポンコードなど）を行うことができます。
+メールのテンプレートはSendGridの[Webダッシュボード](https://sendgrid.com/templates/)上で編集します。メール本文に対して宛先ごとに文字の埋め込み（宛名やクーポンコードなど）を行うことができます。
 
 # ライセンス
 本プラグインは[MITライセンス](https://github.com/SendGridJP/kintone-sendgrid-plugin/blob/master/LICENSE.txt)で提供されています。
@@ -50,17 +50,17 @@ SendGrid kintoneプラグインが動作するためにアプリ側では宛先�
 ![](images/15-2.png)
 
 ### APIキーの設定
-**共通設定** タブでSendGridのAPIキーを設定します。SendGridの[Webポータル](https://app.sendgrid.com/settings/api_keys)でAPIキー(必要なパーミッションについてはプラグインの設定画面を参照)を生成します。生成したAPIキーを設定画面内のテキストボックスに貼り付けます。
+**共通設定** タブでSendGridのAPIキーを設定します。SendGridの[Webダッシュボード](https://app.sendgrid.com/settings/api_keys)でAPIキーを生成します。APIキーに必要なパーミッションについてはプラグインの設定画面を参照してください。生成したAPIキーを設定画面内のテキストボックスに貼り付けます。
 
 ![](images/15-3.png)
 
 ### メール設定
-次に送信設定タブを選択します。メール設定ではFrom（メールの送信元アドレス）、Toフィールド（宛先アドレスを格納するフィールド）の設定を行います。
+次に**送信設定**タブを選択します。メール設定ではFrom（メールの送信元アドレス）、Toフィールド（宛先アドレスを格納するフィールド）の設定を行います。
 
 ![](images/15-4.png)
 
 ### テンプレート設定
-テンプレート設定では、送信するメール本文のタイプ（マルチパートまたはテキスト）と、標準で使用するテンプレートを選択します。テンプレートは[SendGridのダッシュボード上](https://sendgrid.com/templates)で行います。詳しい手順については[ドキュメント](https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/using_templates.html#-Edit)を参照してください。テンプレート編集後、「**テンプレートの取得**」ボタンを選択してテンプレート選択プルダウンを更新してください。
+テンプレート設定では、送信するメール本文のタイプ（マルチパートまたはテキスト）と、標準で使用するテンプレートを選択します。テンプレートの管理は[SendGridのダッシュボード上](https://sendgrid.com/templates)で行います。詳しい手順については[ドキュメント](https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/using_templates.html#-Edit)を参照してください。テンプレート編集後、「**テンプレートの取得**」ボタンを選択してテンプレート選択プルダウンを更新してください。
 
 ![](images/15-5.png)
 
