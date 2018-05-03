@@ -30,7 +30,7 @@ jQuery.noConflict();
       $('#email_from_name_container_label').text('From表示名');
       $('#email_from_name_help_label').text('From表示名を入力してください。');
       $('#email_to_container_label').text('Toフィールド');
-      $('#email_to_help_label').text('「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。宛先フィールドは値の重複を禁止する必要があります。');
+      $('#email_to_help_label').text('「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。');
 
       $('#content_type_label').text('送信するメール本文のタイプ');
       $('#content_type_multipart_label').text('マルチパートメール (テキスト+HTML)');
@@ -316,8 +316,7 @@ jQuery.noConflict();
       var knFields = resp.properties;
 
       for (var i = 0; i < knFields.length; i++) {
-        if (knFields[i].unique === 'true' &&
-          (knFields[i].type === 'SINGLE_LINE_TEXT' ||
+        if ((knFields[i].type === 'SINGLE_LINE_TEXT' ||
           (knFields[i].type === 'LINK' && knFields[i].protocol === 'MAIL')))
         {
           var op = $('<option/>');
