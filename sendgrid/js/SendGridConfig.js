@@ -117,7 +117,7 @@ jQuery.noConflict();
 
     // Event : Select add substitution button.
     $('#add-sub').on('click', function() {
-      kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
+      kintone.api(kintone.api.url('/k/v1/form',true), 'GET', {app: appId}, function(resp) {
         addSub('', '', resp);
       });
     });
@@ -303,7 +303,7 @@ jQuery.noConflict();
   }
 
   function getKintoneFields() {
-    return kintone.api('/k/v1/form', 'GET', {app: appId}).then(function(resp) {
+    return kintone.api(kintone.api.url('/k/v1/form',true), 'GET', {app: appId}).then(function(resp) {
       return resp;
     });
   }
