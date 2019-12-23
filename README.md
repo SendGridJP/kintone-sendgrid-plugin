@@ -32,6 +32,50 @@ See [here](https://sendgridjp.github.io/kintone-sendgrid-plugin/) in Japanese.
 
 ## Requirement
 * SendGrid account.
+* Kintone account.
+
+## Development
+1. Cloning the repository to any folder.
+  ```
+  $ cd /Path/to/the/folder
+  $ git clone https://github.com/SendGridJP/kintone-sendgrid-plugin.git
+  ```
+2. Resolving dependencies.
+  ```
+  $ cd kintone-sendgrid-plugin
+  $ npm install
+  ```
+3. Set environment variables for [plugin uploader](https://developer.cybozu.io/hc/ja/articles/360000947326) and [plugin packer](https://developer.cybozu.io/hc/ja/articles/360000910783).
+  ```
+  # Variables for plugin uploader
+  export KINTONE_DOMAIN=XXXXXXXX.cybozu.com
+  export KINTONE_USERNAME=%%KINTONE UERNAME%%
+  export KINTONE_PASSWORD=%%KINTONE PASSWORD%%
+  # Variables for plugin packer
+  export KINTONE_PPK=%%PPK FILE%%.ppk
+  ```
+3. Building a plugin file.
+  ```
+  $ npm run build
+
+  > kintone-sendgrid-plugin@1.0.0 build /Path/to/the/folder/kintone-sendgrid-plugin
+  > kintone-plugin-packer ./sendgrid --ppk $KINTONE_PPK
+
+  Succeeded: /Path/to/the/folder/kintone-sendgrid-plugin/plugin.zip
+  ```
+4. Uploading the plugin file.
+  ```
+  $ npm run upload
+
+  > kintone-sendgrid-plugin@1.0.0 upload /Path/to/the/folder/kintone-sendgrid-plugin
+  > kintone-plugin-uploader --domain $KINTONE_DOMAIN --username $KINTONE_USERNAME --password $KINTONE_PASSWORD plugin.zip
+
+  Open https://XXXXXXXX.cybozu.com/login?saml=off
+  Trying to log in...
+  Navigate to https://XXXXXXXX.cybozu.com/k/admin/system/plugin/
+  Trying to upload plugin.zip
+  plugin.zip をアップロードしました!
+  ```
 
 ## Licence
 

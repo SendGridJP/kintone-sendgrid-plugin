@@ -1,0 +1,28 @@
+{
+  "name": "kintone-sendgrid-plugin",
+  "version": "1.0.0",
+  "description": "A plug-in enables kintone to send emails through SendGrid.",
+  "main": "",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upload": "kintone-plugin-uploader --domain $KINTONE_DOMAIN --username $KINTONE_USERNAME --password $KINTONE_PASSWORD plugin.zip",
+    "build": "kintone-plugin-packer ./sendgrid --ppk $KINTONE_PPK"
+  },
+  "devDependencies": {
+    "@kintone/plugin-packer": "^2.0.7",
+    "@kintone/plugin-uploader": "^3.0.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SendGridJP/kintone-sendgrid-plugin.git"
+  },
+  "author": "Wataru Sato",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SendGridJP/kintone-sendgrid-plugin/issues"
+  },
+  "homepage": "https://github.com/SendGridJP/kintone-sendgrid-plugin#readme"
+}
