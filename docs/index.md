@@ -28,7 +28,7 @@
 ## 2. プラグインのインストールと有効化
 
 ### 2-1. プラグインの読み込み
-最新版のプラグインを[こちらからダウンロード](https://github.com/SendGridJP/kintone-sendgrid-plugin/blob/master/plugin.zip?raw=true)して読み込みます。詳しい手順は[こちら](https://help.cybozu.com/ja/k/admin/plugin.html)を参照してください。
+最新版のプラグインを[こちらからダウンロード](https://github.com/SendGridJP/kintone-sendgrid-plugin/blob/master/dist/plugin.zip?raw=true)して読み込みます。詳しい手順は[こちら](https://help.cybozu.com/ja/k/admin/plugin.html)を参照してください。
 
 ### 2-2. アプリへのプラグインの追加
 「**アプリの設定 > 設定 > プラグイン**」からSendGridプラグインを追加します。

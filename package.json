@@ -7,13 +7,16 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "upload": "kintone-plugin-uploader --domain $KINTONE_DOMAIN --username $KINTONE_USERNAME --password $KINTONE_PASSWORD plugin.zip",
-    "build": "kintone-plugin-packer ./sendgrid --ppk $KINTONE_PPK"
+    "start": "node scripts/npm-start.js",
+    "upload": "kintone-plugin-uploader dist/plugin.zip --domain $KINTONE_DOMAIN --username $KINTONE_USERNAME --password $KINTONE_PASSWORD --watch --waiting-dialog-ms 3000",
+    "develop": "npm run build -- --watch",
+    "build": "kintone-plugin-packer --ppk $KINTONE_PPK --out dist/plugin.zip src ",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@kintone/plugin-packer": "^2.0.7",
-    "@kintone/plugin-uploader": "^3.0.6"
+    "@kintone/plugin-uploader": "^3.0.6",
+    "npm-run-all": "^4.1.5"
   },
   "repository": {
     "type": "git",

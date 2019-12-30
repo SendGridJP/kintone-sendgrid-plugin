@@ -1,5 +1,84 @@
 jQuery.noConflict();
 
+var STRINGS = {
+  'ja': {
+    'title_label': 'SendGrid プラグイン設定画面',
+    'general_settings_label': '共通設定',
+    'spot_send_settings_label': '送信設定',
+    'auth_sub_title_label': '認証設定',
+    'auth_container_label': 'APIキー',
+    'auth_help_label': 'SendGrid のAPIキーを入力してください。詳細は',
+    'auth_link': 'https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/manage_api_key.html',
+    'auth_link_label': 'こちら',
+    'auth_permission_label': '必要なパーミッション',
+    'email_sub_title_label': 'メール設定',
+    'email_from_help_label': 'メールの送信元アドレス（from）を入力してください。',
+    'email_from_name_container_label': 'From表示名',
+    'email_from_name_help_label': 'From表示名を入力してください。',
+    'email_to_container_label': 'Toフィールド',
+    'email_to_help_label': '「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。',
+    'content_type_label': '送信するメール本文のタイプ',
+    'content_type_multipart_label': 'マルチパートメール (テキスト+HTML)',
+    'content_type_plain_label': 'テキストメール',
+    'template_sub_title_label': 'テンプレート設定',
+    'template_get_btn': 'テンプレートの取得',
+    'template_container_label': 'デフォルトテンプレート',
+    'template_help_label': 'メールテンプレートを下のボタンから取得後、選択してください。',
+    'template_edit_label': 'テンプレートを編集',
+    'optional_sub_title_label': 'オプション設定',
+    'sub_sub_title_label': '置換設定',
+    'sub_add_btn': 'Substitution Tagの追加',
+    'save_btn': '保存',
+    'cancel_btn': 'キャンセル',
+    'sub_tag_variable_error': 'Substitution tagには半角英数のみ使用可能です',
+    'sendgrid_apikey_alert': 'APIキーの確認に失敗しました。 ',
+    'template_select_alert': 'テンプレートの取得に失敗しました。 ',
+    'sendgrid_apikey_required': 'APIキーは必須です',
+    'from_required': 'Fromは必須です',
+    'to_required': 'Toフィールドは必須です',
+    'template_required': 'メールテンプレートは必須です',
+    'kintone_field': 'kintoneのフィールド'
+  },
+  'default': {
+    'title_label': 'SendGrid Plug-in Settings',
+    'general_settings_label': 'General Settings',
+    'spot_send_settings_label': 'Send Settings',
+    'auth_sub_title_label': 'Authentication settings',
+    'auth_container_label': 'API key',
+    'auth_help_label': 'Enter the API key provided by SendGrid. ',
+    'auth_link': 'https://sendgrid.com/docs/User_Guide/Settings/api_keys.html',
+    'auth_link_label': 'API Key Documentation',
+    'auth_permission_label': 'Required permissions',
+    'email_sub_title_label': 'Email settings',
+    'email_from_help_label': 'Enter from email address. ',
+    'email_from_name_container_label': 'From name',
+    'email_from_name_help_label': 'Enter from email name. ',
+    'email_to_container_label': 'To field',
+    'email_to_help_label': 'Select the [Text(single-line)] or the [Link(Type is E-mail address)] field.',
+    'content_type_label': 'Content type',
+    'content_type_multipart_label': 'Multipart mail (Plain text + HTML)',
+    'content_type_plain_label': 'Plain text mail',
+    'template_sub_title_label': 'Template settings',
+    'template_get_btn': 'Get a list of Templates',
+    'template_container_label': 'Default Template',
+    'template_help_label': 'Get a list of all the templates and select a template.',
+    'template_edit_label': 'Edit Template',
+    'optional_sub_title_label': 'Optional settings',
+    'sub_sub_title_label': 'Substitution settings',
+    'sub_add_btn': 'Add substitution tag',
+    'save_btn': '     Save     ',
+    'cancel_btn': '     Cancel   ',
+    'sub_tag_variable_error': 'Substitution tag must be single byte characters',
+    'sendgrid_apikey_alert': 'API validate failed. ',
+    'template_select_alert': 'Getting templates failed. ',
+    'sendgrid_apikey_required': 'API key is required',
+    'from_required': 'From is required',
+    'to_required': 'To field is required',
+    'template_required': 'Mail Template is required',
+    'kintone_field': 'kintone Field'
+  }
+};
+
 (function($, PLUGIN_ID) {
   'use strict';
   // Config key
@@ -8,47 +87,40 @@ jQuery.noConflict();
   var userInfo = kintone.getLoginUser();
   // appId
   var appId = kintone.app.getId();
+  //
+  var lang = userInfo.language;
 
   // Event : Ready
   $(document).ready(function() {
     // Translate UI
-    if (userInfo.language === 'ja') {
-      $('#title_label').text('SendGrid プラグイン設定画面');
-
-      $('#general_settings_label').text('共通設定');
-      $('#spot_send_settings_label').text('送信設定');
-
-      $('#auth_sub_title_label').text('認証設定');
-      $('#auth_container_label').text('APIキー');
-      $('#auth_help_label').text('SendGrid のAPIキーを入力してください。詳細は');
-      $('#auth_link_label').text('こちら');
-      $('#auth_link').attr('href', 'https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/manage_api_key.html');
-      $('#auth_permission_label').text('必要なパーミッション');
-
-      $('#email_sub_title_label').text('メール設定');
-      $('#email_from_help_label').text('メールの送信元アドレス（from）を入力してください。');
-      $('#email_from_name_container_label').text('From表示名');
-      $('#email_from_name_help_label').text('From表示名を入力してください。');
-      $('#email_to_container_label').text('Toフィールド');
-      $('#email_to_help_label').text('「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。');
-
-      $('#content_type_label').text('送信するメール本文のタイプ');
-      $('#content_type_multipart_label').text('マルチパートメール (テキスト+HTML)');
-      $('#content_type_plain_label').text('テキストメール');
-
-      $('#template_sub_title_label').text('テンプレート設定');
-      $('#template_get_btn').text('テンプレートの取得');
-      $('#template_container_label').text('デフォルトテンプレート');
-      $('#template_help_label').text('メールテンプレートを下のボタンから取得後、選択してください。');
-      $('#template_edit_label').text('テンプレートを編集');
-
-      $('#optional_sub_title_label').text('オプション設定');
-      $('#sub_sub_title_label').text('置換設定');
-      $('#sub_add_btn').text('Substitution Tagの追加');
-
-      $('#save_btn').text('保存');
-      $('#cancel_btn').text('キャンセル');
-    }
+    $('#title_label').text(getStrings(lang, 'title_label'));
+    $('#general_settings_label').text(getStrings(lang, 'general_settings_label'));
+    $('#spot_send_settings_label').text(getStrings(lang, 'spot_send_settings_label'));
+    $('#auth_sub_title_label').text(getStrings(lang, 'auth_sub_title_label'));
+    $('#auth_container_label').text(getStrings(lang, 'auth_container_label'));
+    $('#auth_help_label').text(getStrings(lang, 'auth_help_label'));
+    $('#auth_link_label').text(getStrings(lang, 'auth_link_label'));
+    $('#auth_link').attr('href', getStrings(lang, 'auth_link'));
+    $('#auth_permission_label').text(getStrings(lang, 'auth_permission_label'));
+    $('#email_sub_title_label').text(getStrings(lang, 'email_sub_title_label'));
+    $('#email_from_help_label').text(getStrings(lang, 'email_from_help_label'));
+    $('#email_from_name_container_label').text(getStrings(lang, 'email_from_name_container_label'));
+    $('#email_from_name_help_label').text(getStrings(lang, 'email_from_name_help_label'));
+    $('#email_to_container_label').text(getStrings(lang, 'email_to_container_label'));
+    $('#email_to_help_label').text(getStrings(lang, 'email_to_help_label'));
+    $('#content_type_label').text(getStrings(lang, 'content_type_label'));
+    $('#content_type_multipart_label').text(getStrings(lang, 'content_type_multipart_label'));
+    $('#content_type_plain_label').text(getStrings(lang, 'content_type_plain_label'));
+    $('#template_sub_title_label').text(getStrings(lang, 'template_sub_title_label'));
+    $('#template_get_btn').text(getStrings(lang, 'template_get_btn'));
+    $('#template_container_label').text(getStrings(lang, 'template_container_label'));
+    $('#template_help_label').text(getStrings(lang, 'template_help_label'));
+    $('#template_edit_label').text(getStrings(lang, 'template_edit_label'));
+    $('#optional_sub_title_label').text(getStrings(lang, 'optional_sub_title_label'));
+    $('#sub_sub_title_label').text(getStrings(lang, 'sub_sub_title_label'));
+    $('#sub_add_btn').text(getStrings(lang, 'sub_add_btn'));
+    $('#save_btn').text(getStrings(lang, 'save_btn'));
+    $('#cancel_btn').text(getStrings(lang, 'cancel_btn'));
 
     // Display saved data
     if (Object.keys(config).length > 0) {
@@ -64,7 +136,7 @@ jQuery.noConflict();
             $('#sendgrid_apikey_alert').empty().hide();
           })
           .catch(function(reason) {
-            var text = isJa() ? 'APIキーの確認に失敗しました。 ' : 'API validate failed. ';
+            var text = getStrings(lang, 'sendgrid_apikey_alert');
             $('#sendgrid_apikey_alert')
               .append($('<p />', {text: text + reason}))
               .show();
@@ -126,19 +198,19 @@ jQuery.noConflict();
     $('#submit').on('click', function() {
       // Required field check
       if (!$('#sendgrid_apikey').val()) {
-        swal('Error', isJa() ? 'APIキーは必須です' : 'API key is required', 'error');
+        swal('Error', getStrings(lang, 'sendgrid_apikey_required'), 'error');
         return;
       }
       if (!$('#from').val()) {
-        swal('Error', isJa() ? 'Fromは必須です' : 'From is required', 'error');
+        swal('Error', getStrings(lang, 'from_required'), 'error');
         return;
       }
       if (!$('#email_select').val()) {
-        swal('Error', isJa() ? 'Toフィールドは必須です' : 'To field is required', 'error');
+        swal('Error', getStrings(lang, 'to_required'), 'error');
         return;
       }
       if (!$('#template_select').val()) {
-        swal('Error', isJa() ? 'メールテンプレートは必須です' : 'Mail Template is required', 'error');
+        swal('Error', getStrings(lang, 'template_required'), 'error');
         return;
       }
       // Validate API key
@@ -166,11 +238,7 @@ jQuery.noConflict();
           for (var q = 0; q < subContainer.children().length; q++) {
             if ($('#sub_tag_variable_' + q).val() !== '' && $('#field_select' + q).val() !== '') {
               if ($('#sub_tag_variable_' + q).val().match(/^[a-zA-Z0-9!-/:-@¥[-`¥{-~]+$/) === null) {
-                swal(
-                  'Error',
-                  isJa() ? 'Substitution tagには半角英数のみ使用可能です' : 'Substitution tag must be single byte characters',
-                  'error'
-                );
+                swal('Error', getStrings(lang, 'sub_tag_variable_error'), 'error');
                 return;
               }
               saveConfig['val' + subNumber] = $('#sub_tag_variable_' + q).val();
@@ -179,6 +247,7 @@ jQuery.noConflict();
             }
           }
           saveConfig.subNumber = String(subNumber);
+          console.log(saveConfig);
           // Save proxy config
           var headers = getHeaders();
           kintone.plugin.app.setConfig(saveConfig, function(){
@@ -193,7 +262,7 @@ jQuery.noConflict();
         })
         .catch(function(reason) {
           apiKeyAlert.empty().hide();
-          var text = isJa() ? 'APIキーの確認に失敗しました。 ' : 'API validate failed. ';
+          var text = getStrings(lang, 'sendgrid_apikey_alert');
           swal('Error', text + reason, 'error');
           $('#sendgrid_apikey_alert')
             .append($('<p />', {text: text + reason}))
@@ -226,10 +295,6 @@ jQuery.noConflict();
     }, function(e) {
       return Promise.reject('Unknown error:: ' + JSON.stringify(e));
     });
-  }
-
-  function isJa() {
-    return userInfo.language === 'ja';
   }
 
   function getHeaders() {
@@ -283,7 +348,7 @@ jQuery.noConflict();
         getVersion(config.templateId);
       })
       .catch(function(reason) {
-        var text = isJa() ? 'テンプレートの取得に失敗しました。 ' : 'Getting templates failed. ';
+        var text = getStrings(lang, 'template_select_alert');
         alert.append($('<p />', {text: text + reason})).show();
       });
   }
@@ -363,11 +428,7 @@ jQuery.noConflict();
 
     var rightBlock = $('<div/>').addClass('rightblock');
     var valLabel = $('<label/>').addClass('kintoneplugin-label');
-    if (userInfo.language === 'ja') {
-      valLabel.text('kintoneのフィールド');
-    } else {
-      valLabel.text('kintone Field');
-    }
+    valLabel = getStrings(lang, 'kintone_field');
     var valInput =
       $('<div/>')
       .addClass('kintoneplugin-select-outer')
@@ -396,5 +457,15 @@ jQuery.noConflict();
     rightBlock.append(valLabel).append($('<br>')).append(valInput);
     subRow.append(rightBlock);
     subContainer.append(subRow);
+  }
+
+  function getStrings(language, key) {
+    var value = '';
+    if (language in STRINGS) {
+      value = STRINGS[language][key];
+    } else {
+      value = STRINGS.default[key];
+    }
+    return value;
   }
 })(jQuery, kintone.$PLUGIN_ID);
