@@ -1,5 +1,30 @@
 jQuery.noConflict();
 
+var STRINGS = {
+  'ja': {
+    'template_label': 'テンプレート',
+    'confirm_sending': 'メールを送信しますか？',
+    'cancel': 'キャンセル',
+    'send': '送信',
+    'request_successed': 'メールの送信リクエストに成功しました。',
+    'request_failed': 'メールの送信リクエストに失敗しました。',
+    'kintone_error': 'Kintoneエラー。',
+    'warning_sending_title': 'メールを送信する前に画面をリロードしてください',
+    'warning_sending_message': 'メールリストの反映にはリロードが必要です'
+  },
+  'default': {
+    'template_label': 'Template',
+    'confirm_sending': 'Do you send emails?',
+    'cancel': 'Cancel',
+    'send': 'Send',
+    'request_successed': 'Your requests for mail sending were successful.',
+    'request_failed': 'Your requests for mail sending were failed.',
+    'kintone_error': 'Kintone error.',
+    'warning_sending_title': 'Before mail will be sending, reloading is required.',
+    'warning_sending_message': 'Reloading is required'
+  }
+};
+
 (function($, PLUGIN_ID) {
   'use strict';
   //Config key
@@ -12,6 +37,8 @@ jQuery.noConflict();
   var results = [];
   // SendMail progress
   var progress = 0;
+  //
+  var lang = userInfo.language;
 
   // Event : Record show
   kintone.events.on('app.record.index.show', function(event) {
@@ -23,7 +50,7 @@ jQuery.noConflict();
       text: 'mail',
       'class': 'material-icons vertical-align-middle'
     });
-    var labelText = (userInfo.language === 'ja') ? 'テンプレート' : 'Template';
+    var labelText = getStrings(lang, 'template_label');;
     var labelTemplate = $('<a />', {
       text: labelText,
       href: 'https://sendgrid.com/templates',
@@ -86,14 +113,9 @@ jQuery.noConflict();
     $('#send_mail').on('click', function() {
       if (records.length > 0) {
         // confirm before send
-        var title = 'Are you sure?';
-        var cancelButtonText = 'Cancel';
-        var confirmButtonText = 'Send';
-        if (userInfo.language === 'ja') {
-          title = 'メールを送信しますか？';
-          cancelButtonText = 'キャンセル';
-          confirmButtonText = '送信';
-        }
+        var title = getStrings(lang, 'confirm_sending');
+        var cancelButtonText = getStrings(lang, 'cancel');
+        var confirmButtonText = getStrings(lang, 'send');
         swal({
           title: title,
           type: 'warning',
@@ -168,14 +190,8 @@ jQuery.noConflict();
   }
 
   function showResults(results) {
-    var mesSuccess = 'A request for mail sending was success.';
-    if (userInfo.language === 'ja') {
-      mesSuccess = 'メールの送信リクエストに成功しました。';
-    }
-    var mesFail = 'A request for mail sending was failed.';
-    if (userInfo.language === 'ja') {
-      mesFail = 'メールの送信リクエストに失敗しました。';
-    }
+    var mesSuccess = getStrings(lang, 'request_successed');
+    var mesFail = getStrings(lang, 'request_failed');
     var mesDetail = '';
     var hasFail = false;
     for (var i = 0; i < results.length; i++) {
@@ -194,10 +210,7 @@ jQuery.noConflict();
   }
 
   function showKintoneError(respKintone) {
-    var message = 'Kintone error.';
-    if (userInfo.language === 'ja') {
-      message = 'Kintoneエラー。';
-    }
+    var message = getStrings(lang, 'kintone_error');
     message = message + '<br />status: ' + respKintone.code;
     message = message + '<br />message: ' + respKintone.message;
     swal('Failed', message, 'error');
@@ -266,13 +279,19 @@ jQuery.noConflict();
   }
 
   kintone.events.on('app.record.index.edit.submit', function(event) {
-    var title = 'Before mail will be sending, reloading is required.';
-    var message = 'Reloading is required';
-    if (userInfo.language === 'ja') {
-      title = 'メールを送信する前に画面をリロードしてください';
-      message = 'メールリストの反映にはリロードが必要です';
-    }
+    var title = getStrings(lang, 'warning_sending_title');
+    var message = getStrings(lang, 'warning_sending_message');
     swal(title, message, 'warning');
     return event;
   });
+
+  function getStrings(language, key) {
+    var value = '';
+    if (language in STRINGS) {
+      value = STRINGS[language][key];
+    } else {
+      value = STRINGS.default[key];
+    }
+    return value;
+  }
 })(jQuery, kintone.$PLUGIN_ID);
