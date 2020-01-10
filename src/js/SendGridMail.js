@@ -75,8 +75,13 @@ var STRINGS = {
     templateOuter.append(templateDiv);
     $(kintone.app.getHeaderMenuSpaceElement()).append(templateOuter);
 
+    var templateGeneration = config.templateGeneration;
+    if (!config.templateGeneration) {
+      templateGeneration = 'legacy';
+    }
+
     // Get Templates
-    var templates = getTemplates().then(function(templates){
+    var templates = getTemplates(templateGeneration).then(function(templates){
       for (var m = 0; m < templates.length; m++) {
         var template = templates[m];
         for (var n = 0; n < template.versions.length; n++) {
@@ -220,19 +225,42 @@ var STRINGS = {
   function makeParams(records, config, sandbox_mode) {
     var param = {};
     var personalizations = [];
-    for (var i = 0; i < records.length; i++) {
-      // Skip the empty recipients
-      if (records[i][config.emailFieldCode].value === '') {
-        continue;
+    var templateGeneration = config.templateGeneration;
+    if (!config.templateGeneration) {
+      templateGeneration = 'legacy';
+    }
+    if (templateGeneration === 'legacy') {
+      // Legacy Transactional Template
+      for (var i = 0; i < records.length; i++) {
+        // Skip the empty recipients
+        if (records[i][config.emailFieldCode].value === '') {
+          continue;
+        }
+        var personalization = {};
+        personalization.to = [];
+        personalization.to.push({'email': records[i][config.emailFieldCode].value});
+        personalization.substitutions = {};
+        for (var k = 0; k < config.subNumber; k++) {
+          personalization.substitutions[config['val'+k]] = records[i][config['code'+k]].value;
+        }
+        personalizations.push(personalization);
       }
-      var personalization = {};
-      personalization.to = [];
-      personalization.to.push({'email': records[i][config.emailFieldCode].value});
-      personalization.substitutions = {};
-      for (var k = 0; k < config.subNumber; k++) {
-        personalization.substitutions[config['val'+k]] = records[i][config['code'+k]].value;
+    } else {
+      // Dynamic Transactional Template
+      for (var i = 0; i < records.length; i++) {
+        // Skip the empty recipients
+        if (records[i][config.emailFieldCode].value === '') {
+          continue;
+        }
+        var personalization = {};
+        personalization.to = [];
+        personalization.to.push({'email': records[i][config.emailFieldCode].value});
+        personalization.dynamic_template_data = {};
+        for (var k = 0; k < config.dtdNumber; k++) {
+          personalization.dynamic_template_data[config['dtd_key_'+k]] = records[i][config['dtd_val_'+k]].value;
+        }
+        personalizations.push(personalization);
       }
-      personalizations.push(personalization);
     }
     param.personalizations = personalizations;
     param.from = {'email': config.from, 'name': config.fromName};
@@ -243,6 +271,7 @@ var STRINGS = {
       param.content = [];
       param.content.push({'type': 'text/plain', 'value': ' '});
     }
+    //console.log(JSON.stringify(param));
     return param;
   }
 
@@ -263,8 +292,8 @@ var STRINGS = {
   }
 
   // Get Templates
-  function getTemplates() {
-    var url = 'https://api.sendgrid.com/v3/templates';
+  function getTemplates(generation) {
+    var url = 'https://api.sendgrid.com/v3/templates?generations=' + generation;
     return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
       var response = JSON.parse(resp[0]);
       if (response.templates.length > 0 && response.errors === undefined) {

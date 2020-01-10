@@ -1,13 +1,10 @@
-.block {
+.child-block{
 	padding: 0 0 20px 0;
+	display: flex;
 }
 
-.childBlock{
-	padding: 0 0 20px 0;
-}
-
-.leftblock{
-    margin:0px 150px 0px 0px;
+.left-block{
+    margin:0px 40px 0px 0px;
 }
 
 .config {
@@ -121,4 +118,17 @@ ul.items {
 
 .swal2-content {
 	word-break: break-all;
+}
+
+.child-vertical-center {
+	display: flex;
+  align-items: center;
+}
+
+.icon-outer {
+	margin: 0 0 0 5px;
+}
+
+.link-button {
+	margin: 0 0 0 5px;
 }

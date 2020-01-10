@@ -41,10 +41,12 @@
         "css": [
             "css/51-current-defult.css",
             "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
+            "https://fonts.googleapis.com/icon?family=Material+Icons",
             "css/sendgrid-design.css"
 
         ],
         "required_params": [
+            "templateGeneration",
             "templateName",
             "templateId",
             "emailFieldCode",

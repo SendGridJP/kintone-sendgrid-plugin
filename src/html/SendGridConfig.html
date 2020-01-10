@@ -79,8 +79,6 @@
             </div>
           </div>
         </div>
-
-        <h2><span id="template_sub_title_label"></span></h2>
         <!-- Content type -->
         <div class="kintoneplugin-row">
           <div class="kintoneplugin-label">
@@ -90,60 +88,95 @@
           <div class="kintoneplugin-row">
             <div class="kintoneplugin-input-radio-item">
               <span class="kintoneplugin-input-radio-item">
-                <input type="radio" name="content_type" value="multipart/alternative" id="content_type_multipart"><label id="content_type_multipart_label" for="content_type_multipart"></label>
-                <input type="radio" name="content_type" value="text/plain" id="content_type_plain"><label id="content_type_plain_label" for="content_type_plain"></label>
+                <input type="radio" name="content_type" value="multipart/alternative" id="content_type_multipart">
+                <label id="content_type_multipart_label" for="content_type_multipart"></label>
+                <input type="radio" name="content_type" value="text/plain" id="content_type_plain">
+                <label id="content_type_plain_label" for="content_type_plain"></label>
               </span>
             </div>
           </div>
         </div>
+
+        <h2><span id="template_sub_title_label"></span></h2>
+        <!-- Dynamic or Legacy -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="template_generation_label"></span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-input-radio-item">
+              <span class="kintoneplugin-input-radio-item">
+                <input type="radio" name="template_generation" value="dynamic" id="template_generation_dynamic" checked>
+                <label for="template_generation_dynamic">Dynamic</label>
+                <input type="radio" name="template_generation" value="legacy" id="template_generation_legacy">
+                <label for="template_generation_legacy">Legacy</label>
+              </span>
+            </div>
+          </div>
+        </div>
+
         <!-- Mail Template -->
         <div class="kintoneplugin-row">
           <div class="kintoneplugin-label">
             <span id ="template_container_label"></span>
             <span class="kintoneplugin-require">*</span>
           </div>
-          <div class="kintoneplugin-row">
-            <span id="template_help_label">
-              <br />
-            </span>
-            <a id="template_edit_label" href="https://sendgrid.com/templates" target="_blank"></a>
-          </div>
-          <div class="button-block" style="float:left;">
-            <button type="button" id="get-template" class="kintoneplugin-button-normal">
-              <span id ="template_get_btn"></span>
-            </button>&nbsp;&nbsp;
-          </div>
-          <div class="kintoneplugin-select-outer">
-            <div class="kintoneplugin-select">
-              <select id="template_select">
-                <option></option>
-              </select>
+          <!--  -->
+          <div class="kintoneplugin-row child-vertical-center">
+            <div class="kintoneplugin-select-outer">
+              <div class="kintoneplugin-select">
+                <select id="template_select">
+                  <option></option>
+                </select>
+              </div>
             </div>
+            <a class="icon-outer" id="refresh-templates" href="#">
+              <i class="material-icons">refresh</i>
+            </a>
+            <a class="icon-outer" id="template_edit_label" href="https://sendgrid.com/templates" target="_blank">
+              <i class="material-icons">edit</i>
+            </a>
           </div>
           <div class="kintoneplugin-alert" id="template_select_alert"></div>
           <div class="kintoneplugin-row">
-            <strong>Subject</strong><br />
+            <strong>Subject</strong>
             <div id="template_result_subject"></div>
           </div>
           <div class="kintoneplugin-row">
-            <strong>TEXT</strong><br />
-            <textarea id="template_result_text" cols="80" rows="10" disabled="true"></textarea>
+            <strong>TEXT</strong>
+            <div>
+              <textarea id="template_result_text" cols="80" rows="10" disabled="true"></textarea>
+            </div>
           </div>
           <div class="kintoneplugin-row">
-            <strong>HTML</strong><br />
-            <iframe id="template_result_iframe" width="655px" height="250px"></iframe>
+            <strong>HTML</strong>
+            <div>
+              <iframe id="template_result_iframe" width="655px" height="250px"></iframe>
+            </div>
           </div>
         </div>
 
         <h2><span id="optional_sub_title_label"></span></h2>
         <!-- Substitution settings -->
-        <div class="kintoneplugin-row">
+        <div class="kintoneplugin-row" id="substitution-settings">
           <div class="kintoneplugin-label">
             <span id="sub_sub_title_label"></span>
           </div>
           <div id="sub_container"></div>
-          <button type="button" id="add-sub" class="kintoneplugin-button-normal">
-            <span id ="sub_add_btn"></span>
+          <button type="button" id="add-sub" class="kintoneplugin-button-small child-vertical-center">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+        <!-- Dynamic template data settings  -->
+        <div class="kintoneplugin-row" id="dtd-settings">
+          <div class="kintoneplugin-label">
+            <span id="dtd_title_label"></span>
+          </div>
+          <div id="dtd_container">
+          </div>
+          <button type="button" id="add-dtd" class="kintoneplugin-button-small child-vertical-center">
+            <i class="material-icons">add</i>
           </button>
         </div>
       </div>
