@@ -1,5 +1,8 @@
 # Change Log
 
+## [11] - 2020/XX/XX
+- Support Dynamic Transactional Template
+
 ## [10] - 2018/05/03
 - Support duplicate values for the recipient address
 - Support guest space
