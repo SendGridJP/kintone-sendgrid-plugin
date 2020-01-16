@@ -19,21 +19,21 @@
             <span id="auth_container_label"></span>
             <span class="kintoneplugin-require">*</span>
           </div>
-          <div class="kintoneplugin-row">
-            <span id="auth_help_label"></span>
-            <a id="auth_link" href="https://sendgrid.com/docs/User_Guide/Settings/api_keys.html" target="_blank">
-              <span id ="auth_link_label"></span>
-            </a><br />
-            <span id="auth_permission_label"></span>
-            <ul class="items">
-              <li>mail.send</li>
-              <li>templates.read</li>
-            </ul>
-          </div>
           <div class="kintoneplugin-input-outer">
             <input type="password" id="sendgrid_apikey" class="kintoneplugin-input-text"></input>
           </div>
           <div class="kintoneplugin-alert" id="sendgrid_apikey_alert" style="display: none"></div>
+          <div class="kintoneplugin-row">
+            <span id="auth_help_label" class="kintoneplugin-desc"></span>
+            <a id="auth_link" href="https://sendgrid.com/docs/User_Guide/Settings/api_keys.html" target="_blank">
+              <span id ="auth_link_label"></span>
+            </a><br />
+            <span id="auth_permission_label" class="kintoneplugin-desc"></span>
+            <ul class="items">
+              <li class="kintoneplugin-desc">mail.send</li>
+              <li class="kintoneplugin-desc">templates.read</li>
+            </ul>
+          </div>
         </div>
       </div>
       <!-- Spot send settings -->
@@ -45,9 +45,6 @@
             <span id="email_from_container_label">From</span>
             <span class="kintoneplugin-require">*</span>
           </div>
-          <div class="kintoneplugin-row">
-            <span id="email_from_help_label"></span>
-          </div>
           <div class="kintoneplugin-input-outer">
             <input id="from" class="kintoneplugin-input-text"></input>
           </div>
@@ -57,26 +54,37 @@
           <div class="kintoneplugin-label">
             <span id="email_from_name_container_label"></span>
           </div>
-          <div class="kintoneplugin-row">
-            <span id="email_from_name_help_label"></span>
-          </div>
           <div class="kintoneplugin-input-outer">
             <input id="from_name" class="kintoneplugin-input-text"></input>
           </div>
         </div>
-        <!-- To field -->
+        <!-- To -->
         <div class="kintoneplugin-row">
           <div class="kintoneplugin-label">
-            <span id="email_to_container_label"></span>
+            <span>To</span>
             <span class="kintoneplugin-require">*</span>
-          </div>
-          <div class="kintoneplugin-row">
-            <span id="email_to_help_label"></span>
           </div>
           <div class="kintoneplugin-select-outer">
             <div class="kintoneplugin-select">
-              <select id="email_select"></select>
+              <select id="to_select"></select>
             </div>
+          </div>
+          <div class="kintoneplugin-row">
+            <span id="email_to_help_label" class="kintoneplugin-desc"></span>
+          </div>
+        </div>
+        <!-- To name -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="email_to_name_container_label"></span>
+          </div>
+          <div class="kintoneplugin-select-outer">
+            <div class="kintoneplugin-select">
+              <select id="to_name_select"></select>
+            </div>
+          </div>
+          <div class="kintoneplugin-row">
+            <span id="email_to_name_help_label" class="kintoneplugin-desc"></span>
           </div>
         </div>
         <!-- Content type -->

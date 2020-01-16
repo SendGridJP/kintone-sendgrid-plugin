@@ -238,7 +238,11 @@ var STRINGS = {
         }
         var personalization = {};
         personalization.to = [];
-        personalization.to.push({'email': records[i][config.emailFieldCode].value});
+        var to = {'email': records[i][config.emailFieldCode].value};
+        if (config.toNameFieldCode in records[i]) {
+          to['name'] = records[i][config.toNameFieldCode].value;
+        }
+        personalization.to.push(to);
         personalization.substitutions = {};
         for (var k = 0; k < config.subNumber; k++) {
           personalization.substitutions[config['val'+k]] = records[i][config['code'+k]].value;
@@ -254,7 +258,11 @@ var STRINGS = {
         }
         var personalization = {};
         personalization.to = [];
-        personalization.to.push({'email': records[i][config.emailFieldCode].value});
+        var to = {'email': records[i][config.emailFieldCode].value};
+        if (config.toNameFieldCode in records[i]) {
+          to['name'] = records[i][config.toNameFieldCode].value;
+        }
+        personalization.to.push(to);
         personalization.dynamic_template_data = {};
         for (var k = 0; k < config.dtdNumber; k++) {
           personalization.dynamic_template_data[config['dtd_key_'+k]] = records[i][config['dtd_val_'+k]].value;

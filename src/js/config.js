@@ -12,11 +12,10 @@ var STRINGS = {
     'auth_link_label': 'こちら',
     'auth_permission_label': '必要なパーミッション',
     'email_sub_title_label': 'メール設定',
-    'email_from_help_label': 'メールの送信元アドレス（from）を入力してください。',
     'email_from_name_container_label': 'From表示名',
-    'email_from_name_help_label': 'From表示名を入力してください。',
-    'email_to_container_label': 'Toフィールド',
     'email_to_help_label': '「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。',
+    "email_to_name_container_label": 'To表示名',
+    'email_to_name_help_label': '「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。',
     'content_type_label': 'メール本文の種別',
     'content_type_multipart_label': 'マルチパートメール (テキスト+HTML)',
     'content_type_plain_label': 'テキストメール',
@@ -52,11 +51,10 @@ var STRINGS = {
     'auth_link_label': 'API Key Documentation',
     'auth_permission_label': 'Required permissions',
     'email_sub_title_label': 'Email settings',
-    'email_from_help_label': 'Enter from email address. ',
     'email_from_name_container_label': 'From name',
-    'email_from_name_help_label': 'Enter from email name. ',
-    'email_to_container_label': 'To field',
     'email_to_help_label': 'Select the [Text(single-line)] or the [Link(Type is E-mail address)] field.',
+    "email_to_name_container_label": 'To name',
+    'email_to_name_help_label': 'Select the [Text(single-line)] or the [Link(Type is E-mail address)] field.',
     'content_type_label': 'Content type',
     'content_type_multipart_label': 'Multipart mail (Plain text + HTML)',
     'content_type_plain_label': 'Plain text mail',
@@ -166,7 +164,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
         swal('Error', getStrings(lang, 'from_required'), 'error');
         return;
       }
-      if (!$('#email_select').val()) {
+      if (!$('#to_select').val()) {
         swal('Error', getStrings(lang, 'to_required'), 'error');
         return;
       }
@@ -191,7 +189,8 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
           saveConfig.templateGeneration = $('input[name=template_generation]:checked').val();
           saveConfig.templateName = $('#template_select').children(':selected').text();
           saveConfig.templateId = $('#template_select').val();
-          saveConfig.emailFieldCode = $('#email_select').val();
+          saveConfig.emailFieldCode = $('#to_select').val();
+          saveConfig.toNameFieldCode = $('#to_name_select').val();
           // substitution tags
           if (saveConfig.subNumber === undefined) {
             saveConfig.subNumber = 0;
@@ -292,11 +291,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#auth_link').attr('href', getStrings(lang, 'auth_link'));
     $('#auth_permission_label').text(getStrings(lang, 'auth_permission_label'));
     $('#email_sub_title_label').text(getStrings(lang, 'email_sub_title_label'));
-    $('#email_from_help_label').text(getStrings(lang, 'email_from_help_label'));
     $('#email_from_name_container_label').text(getStrings(lang, 'email_from_name_container_label'));
-    $('#email_from_name_help_label').text(getStrings(lang, 'email_from_name_help_label'));
-    $('#email_to_container_label').text(getStrings(lang, 'email_to_container_label'));
     $('#email_to_help_label').text(getStrings(lang, 'email_to_help_label'));
+    $('#email_to_name_container_label').text(getStrings(lang, 'email_to_name_container_label'));
+    $('#email_to_name_help_label').text(getStrings(lang, 'email_to_name_help_label'));
     $('#content_type_label').text(getStrings(lang, 'content_type_label'));
     $('#content_type_multipart_label').text(getStrings(lang, 'content_type_multipart_label'));
     $('#content_type_plain_label').text(getStrings(lang, 'content_type_plain_label'));
@@ -479,28 +477,35 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
 
   function showKintoneData() {
     return getKintoneFields().then(function(resp) {
-      var adArray = [];
-      var labelArray = [];
-      var selectSpace = $('#email_select');
+      var toSelect = $('#to_select');
+      var toNameSelect = $('#to_name_select');
+      toNameSelect.append($('<option/>'));
       var knFields = resp.properties;
 
       for (var i = 0; i < knFields.length; i++) {
         if ((knFields[i].type === 'SINGLE_LINE_TEXT' ||
           (knFields[i].type === 'LINK' && knFields[i].protocol === 'MAIL')))
         {
-          var op = $('<option/>');
-          op.attr('value', knFields[i].code);
+          // To
+          var opTo = $('<option/>');
+          opTo.attr('value', knFields[i].code);
           if (config.emailFieldCode === knFields[i].code) {
-            op.prop('selected', true);
+            opTo.prop('selected', true);
           }
-          op.text(
+          opTo.text(
             knFields[i].label + '(' + knFields[i].code + ')'
           );
-          selectSpace.append(op);
-        }
-        if (knFields[i].type === 'SINGLE_LINE_TEXT') {
-          adArray.push(knFields[i].code);
-          labelArray.push(knFields[i].label);
+          toSelect.append(opTo);
+          // To name
+          var opToName = $('<option/>');
+          opToName.attr('value', knFields[i].code);
+          if (config.toNameFieldCode === knFields[i].code) {
+            opToName.prop('selected', true);
+          }
+          opToName.text(
+            knFields[i].label + '(' + knFields[i].code + ')'
+          );
+          toNameSelect.append(opToName);
         }
       }
       for (var k = 0; k < config.subNumber; k++) {
