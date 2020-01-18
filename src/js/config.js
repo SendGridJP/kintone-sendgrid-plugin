@@ -22,6 +22,10 @@ var FIELD_TYPE_MULTI_LINE_TEXT = [
   'MULTI_LINE_TEXT'
 ];
 
+var FIELD_TYPE_RICH_TEXT = [
+  'RICH_TEXT'
+];
+
 var FIELD_TYPE_ARRAY = [
   'CHECK_BOX',
   'MULTI_SELECT',
@@ -52,6 +56,7 @@ var STRINGS = {
     'sub_sub_title_label': '置換設定',
     'dtd_title_label': 'Dynamic Template Data設定',
     'group_text_label': 'テキストフィールド',
+    'group_rich_text_label': 'リッチテキストフィールド',
     'group_array_label': '配列フィールド',
     'key': 'キー',
     'value': '値',
@@ -91,6 +96,7 @@ var STRINGS = {
     'sub_sub_title_label': 'Substitution settings',
     'dtd_title_label': 'Dynamic Template Data',
     'group_text_label': 'Text fields',
+    'group_rich_text_label': 'Rich text fields',
     'group_array_label': 'Array fields',
     'key': 'Key',
     'value': 'Value',
@@ -649,6 +655,17 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
         );
       }
     }
+    // Rich text fields
+    valSelect.append($('<optgroup/>').attr('label', getStrings(lang, 'group_rich_text_label')));
+    for (var i = 0; i < resp.properties.length; i++) {
+      var code = resp.properties[i].code;
+      var label = resp.properties[i].label;
+      if (isRichTextField(resp.properties[i])) {
+        valSelect.append(
+          makeDtdOption(label, code, default_code)
+        );
+      }
+    }
     // Array fields
     valSelect.append($('<optgroup/>').attr('label', getStrings(lang, 'group_array_label')));
     for (var i = 0; i < resp.properties.length; i++) {
@@ -687,6 +704,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
 
   function isMultiLineTextField(field) {
     return (FIELD_TYPE_MULTI_LINE_TEXT.indexOf(field.type) >= 0);
+  }
+
+  function isRichTextField(field) {
+    return(FIELD_TYPE_RICH_TEXT.indexOf(field.type) >= 0);
   }
 
   function isArrayField(field) {
