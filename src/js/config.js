@@ -18,6 +18,16 @@ var FIELD_TYPE_TEXT = [
   'STATUS'
 ];
 
+var FIELD_TYPE_MULTI_LINE_TEXT = [
+  'MULTI_LINE_TEXT'
+];
+
+var FIELD_TYPE_ARRAY = [
+  'CHECK_BOX',
+  'MULTI_SELECT',
+  'SUBTABLE'
+];
+
 var STRINGS = {
   'ja': {
     'title_label': 'SendGrid プラグイン設定画面',
@@ -41,6 +51,8 @@ var STRINGS = {
     'optional_sub_title_label': 'オプション設定',
     'sub_sub_title_label': '置換設定',
     'dtd_title_label': 'Dynamic Template Data設定',
+    'group_text_label': 'テキストフィールド',
+    'group_array_label': '配列フィールド',
     'key': 'キー',
     'value': '値',
     'save_btn': '保存',
@@ -78,6 +90,8 @@ var STRINGS = {
     'optional_sub_title_label': 'Optional settings',
     'sub_sub_title_label': 'Substitution settings',
     'dtd_title_label': 'Dynamic Template Data',
+    'group_text_label': 'Text fields',
+    'group_array_label': 'Array fields',
     'key': 'Key',
     'value': 'Value',
     'save_btn': '     Save     ',
@@ -623,18 +637,25 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       .attr('id', 'code-outer' + idx);
     var valDiv = $('<div/>').addClass('kintoneplugin-select');
     var valSelect = $('<select/>').addClass('dtd-val').attr('id', 'dtd_field_select' + idx);
+    // Text fields
+    valSelect.append($('<optgroup/>').attr('label', getStrings(lang, 'group_text_label')));
     for (var i = 0; i < resp.properties.length; i++) {
       var code = resp.properties[i].code;
       var label = resp.properties[i].label;
-      if (isTextField(resp.properties[i]))
-      {
-        var valOption = $('<option/>');
-        valOption.attr('value', code);
-        if (default_code == code) {
-          valOption.prop('selected', true);
-        }
-        valOption.text(label + '(' + code + ')');
-        valSelect.append(valOption);
+      if (isTextField(resp.properties[i]) ||
+        isMultiLineTextField(resp.properties[i])) {
+        valSelect.append(
+          makeDtdOption(label, code, default_code)
+        );
+      }
+    }
+    // Array fields
+    valSelect.append($('<optgroup/>').attr('label', getStrings(lang, 'group_array_label')));
+    for (var i = 0; i < resp.properties.length; i++) {
+      var code = resp.properties[i].code;
+      var label = resp.properties[i].label;
+      if (isArrayField(resp.properties[i])) {
+        valSelect.append(makeDtdOption(label, code, default_code));
       }
     }
     // Clear block
@@ -652,8 +673,24 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     dtdContainer.append(dtdRow);
   }
 
+  function makeDtdOption(label, code, default_code) {
+    var valOption = $('<option/>').attr('value', code).text(label + '(' + code + ')');
+    if (default_code === code) {
+      valOption.prop('selected', true);
+    }
+    return valOption;
+  }
+
   function isTextField(field) {
     return (FIELD_TYPE_TEXT.indexOf(field.type) >= 0);
+  }
+
+  function isMultiLineTextField(field) {
+    return (FIELD_TYPE_MULTI_LINE_TEXT.indexOf(field.type) >= 0);
+  }
+
+  function isArrayField(field) {
+    return (FIELD_TYPE_ARRAY.indexOf(field.type) >= 0);
   }
 
   function getStrings(language, key) {

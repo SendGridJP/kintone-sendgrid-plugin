@@ -223,6 +223,7 @@ var STRINGS = {
 
   // Make Mail Send Parameters
   function makeParams(records, config, sandbox_mode) {
+    console.log(JSON.stringify(records));
     var param = {};
     var personalizations = [];
     var templateGeneration = config.templateGeneration;
@@ -279,7 +280,7 @@ var STRINGS = {
       param.content = [];
       param.content.push({'type': 'text/plain', 'value': ' '});
     }
-    //console.log(JSON.stringify(param));
+    console.log(JSON.stringify(param));
     return param;
   }
 
