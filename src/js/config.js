@@ -1,5 +1,23 @@
 jQuery.noConflict();
 
+var FIELD_TYPE_TEXT = [
+  'RECORD_NUMBER',
+  '__ID__',
+  '__REVISION__',
+  'CREATED_TIME',
+  'UPDATED_TIME',
+  'SINGLE_LINE_TEXT',
+  'NUMBER',
+  'CALC',
+  'RADIO_BUTTON',
+  'DROP_DOWN',
+  'LINK',
+  'DATE',
+  'TIME',
+  'DATETIME',
+  'STATUS'
+];
+
 var STRINGS = {
   'ja': {
     'title_label': 'SendGrid プラグイン設定画面',
@@ -13,9 +31,7 @@ var STRINGS = {
     'auth_permission_label': '必要なパーミッション',
     'email_sub_title_label': 'メール設定',
     'email_from_name_container_label': 'From表示名',
-    'email_to_help_label': '「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。',
     "email_to_name_container_label": 'To表示名',
-    'email_to_name_help_label': '「文字列(1行)」フィールドか「リンク」フィールド(入力種別＝メールアドレス)より選択してください。',
     'content_type_label': 'メール本文の種別',
     'content_type_multipart_label': 'マルチパートメール (テキスト+HTML)',
     'content_type_plain_label': 'テキストメール',
@@ -52,9 +68,7 @@ var STRINGS = {
     'auth_permission_label': 'Required permissions',
     'email_sub_title_label': 'Email settings',
     'email_from_name_container_label': 'From name',
-    'email_to_help_label': 'Select the [Text(single-line)] or the [Link(Type is E-mail address)] field.',
     "email_to_name_container_label": 'To name',
-    'email_to_name_help_label': 'Select the [Text(single-line)] or the [Link(Type is E-mail address)] field.',
     'content_type_label': 'Content type',
     'content_type_multipart_label': 'Multipart mail (Plain text + HTML)',
     'content_type_plain_label': 'Plain text mail',
@@ -292,9 +306,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#auth_permission_label').text(getStrings(lang, 'auth_permission_label'));
     $('#email_sub_title_label').text(getStrings(lang, 'email_sub_title_label'));
     $('#email_from_name_container_label').text(getStrings(lang, 'email_from_name_container_label'));
-    $('#email_to_help_label').text(getStrings(lang, 'email_to_help_label'));
     $('#email_to_name_container_label').text(getStrings(lang, 'email_to_name_container_label'));
-    $('#email_to_name_help_label').text(getStrings(lang, 'email_to_name_help_label'));
     $('#content_type_label').text(getStrings(lang, 'content_type_label'));
     $('#content_type_multipart_label').text(getStrings(lang, 'content_type_multipart_label'));
     $('#content_type_plain_label').text(getStrings(lang, 'content_type_plain_label'));
@@ -458,7 +470,6 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     });
   }
 
-  // TODO 表示のスイッチ
   function refreshOptionalSettings(generation) {
     if (generation === 'legacy') {
       $('#substitution-settings').show();
@@ -483,9 +494,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       var knFields = resp.properties;
 
       for (var i = 0; i < knFields.length; i++) {
-        if ((knFields[i].type === 'SINGLE_LINE_TEXT' ||
-          (knFields[i].type === 'LINK' && knFields[i].protocol === 'MAIL')))
-        {
+        if (isTextField(knFields[i])) {
           // To
           var opTo = $('<option/>');
           opTo.attr('value', knFields[i].code);
@@ -552,14 +561,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       .attr('id', 'code-outer' + idx);
     var valDiv = $('<div/>').addClass('kintoneplugin-select');
     var valSelect = $('<select/>').addClass('sub-val').attr('id', 'field_select' + idx);
-    valSelect.append($('<option/>'));
     for (var i = 0; i < resp.properties.length; i++) {
       var code = resp.properties[i].code;
       var label = resp.properties[i].label;
-      if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
-        (resp.properties[i].type === 'LINK' &&
-        resp.properties[i].protocol === 'MAIL'))
-      {
+      if (isTextField(resp.properties[i])) {
         var valOption = $('<option/>');
         valOption.attr('value', code);
         if (default_code == code) {
@@ -618,13 +623,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       .attr('id', 'code-outer' + idx);
     var valDiv = $('<div/>').addClass('kintoneplugin-select');
     var valSelect = $('<select/>').addClass('dtd-val').attr('id', 'dtd_field_select' + idx);
-    valSelect.append($('<option/>'));
     for (var i = 0; i < resp.properties.length; i++) {
       var code = resp.properties[i].code;
       var label = resp.properties[i].label;
-      if (resp.properties[i].type === 'SINGLE_LINE_TEXT' ||
-        (resp.properties[i].type === 'LINK' &&
-        resp.properties[i].protocol === 'MAIL'))
+      if (isTextField(resp.properties[i]))
       {
         var valOption = $('<option/>');
         valOption.attr('value', code);
@@ -648,6 +650,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     dtdRow.append(rightBlock);
     dtdRow.append(clearBlock);
     dtdContainer.append(dtdRow);
+  }
+
+  function isTextField(field) {
+    return (FIELD_TYPE_TEXT.indexOf(field.type) >= 0);
   }
 
   function getStrings(language, key) {
