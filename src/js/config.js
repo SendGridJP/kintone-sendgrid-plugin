@@ -43,6 +43,8 @@ var STRINGS = {
     'auth_link': 'https://sendgrid.kke.co.jp/docs/Tutorials/A_Transaction_Mail/manage_api_key.html',
     'auth_link_label': 'こちら',
     'auth_permission_label': '必要なパーミッション',
+    'sandbox_mode_container_label': 'サンドボックスモード',
+    'sandbox_mode_help_label': '送信リクエスト内容を確認するためのモードです。メールの送信は行いません。',
     'email_sub_title_label': 'メール設定',
     'email_from_name_container_label': 'From表示名',
     "email_to_name_container_label": 'To表示名',
@@ -83,6 +85,8 @@ var STRINGS = {
     'auth_link': 'https://sendgrid.com/docs/User_Guide/Settings/api_keys.html',
     'auth_link_label': 'API Key Documentation',
     'auth_permission_label': 'Required permissions',
+    'sandbox_mode_container_label': 'Sandbox mode',
+    'sandbox_mode_help_label': 'A mode for showing the request on view pages. This mode does not send emails.',
     'email_sub_title_label': 'Email settings',
     'email_from_name_container_label': 'From name',
     "email_to_name_container_label": 'To name',
@@ -225,6 +229,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
           saveConfig.templateId = $('#template_select').val();
           saveConfig.emailFieldCode = $('#to_select').val();
           saveConfig.toNameFieldCode = $('#to_name_select').val();
+          saveConfig.sandboxMode = String($('#sandbox_mode').prop('checked'));
           // substitution tags
           if (saveConfig.subNumber === undefined) {
             saveConfig.subNumber = 0;
@@ -324,6 +329,8 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#auth_link_label').text(getStrings(lang, 'auth_link_label'));
     $('#auth_link').attr('href', getStrings(lang, 'auth_link'));
     $('#auth_permission_label').text(getStrings(lang, 'auth_permission_label'));
+    $('.sandbox_mode_container_label').text(getStrings(lang, 'sandbox_mode_container_label'));
+    $('#sandbox_mode_help_label').text(getStrings(lang, 'sandbox_mode_help_label'));
     $('#email_sub_title_label').text(getStrings(lang, 'email_sub_title_label'));
     $('#email_from_name_container_label').text(getStrings(lang, 'email_from_name_container_label'));
     $('#email_to_name_container_label').text(getStrings(lang, 'email_to_name_container_label'));
@@ -381,6 +388,12 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     }
     // Template
     refreshTemplatesSpace(templateGeneration);
+    // Sandbox mode
+    var sandboxMode = config.sandboxMode;
+    if (!config.sandboxMode) {
+      sandboxMode = 'false';
+    }
+    $('#sandbox_mode').prop('checked', sandboxMode === 'true');
     // Refresh optional settings
     refreshOptionalSettings(templateGeneration);
     // Show kintone data

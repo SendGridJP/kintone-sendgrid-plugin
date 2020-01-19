@@ -6,6 +6,8 @@ var STRINGS = {
     'confirm_sending': 'メールを送信しますか？',
     'cancel': 'キャンセル',
     'send': '送信',
+    'request_parameters': 'リクエストパラメータ',
+    'sandbox_mode': 'サンドボックスモード',
     'request_successed': 'メールの送信リクエストに成功しました。',
     'request_failed': 'メールの送信リクエストに失敗しました。',
     'kintone_error': 'Kintoneエラー。',
@@ -17,6 +19,8 @@ var STRINGS = {
     'confirm_sending': 'Do you send emails?',
     'cancel': 'Cancel',
     'send': 'Send',
+    'request_parameters': 'Request parameters',
+    'sandbox_mode': 'Sandbox mode',
     'request_successed': 'Your requests for mail sending were successful.',
     'request_failed': 'Your requests for mail sending were failed.',
     'kintone_error': 'Kintone error.',
@@ -116,29 +120,21 @@ var STRINGS = {
 
     // Send Mail
     $('#send_mail').on('click', function() {
-      if (records.length > 0) {
-        // confirm before send
-        var title = getStrings(lang, 'confirm_sending');
-        var cancelButtonText = getStrings(lang, 'cancel');
-        var confirmButtonText = getStrings(lang, 'send');
-        swal({
-          title: title,
-          type: 'warning',
-          showCancelButton: true,
-          confirmButtonText: confirmButtonText,
-          cancelButtonText: cancelButtonText,
-        }).then(function() {
-          // send mail
-          var condition= kintone.app.getQueryCondition();
-          kintone.api(
-            kintone.api.url('/k/v1/records', true), 'GET',
-            {app: appId, query: condition, totalCount: true})
-          .then(function(resp) {
-            initSendMail();
-            processRecords(condition, 500, 0, resp.totalCount);
-          });
-        }).catch(swal.noop);
-      }
+      if (records.length == 0) return;
+      // confirm before send
+      confirmSend(config).then(function(result) {
+        // cancel
+        if (!result.value) return;
+        // send mail
+        var condition= kintone.app.getQueryCondition();
+        kintone.api(
+          kintone.api.url('/k/v1/records', true), 'GET',
+          {app: appId, query: condition, totalCount: true})
+        .then(function(resp) {
+          initSendMail();
+          processRecords(condition, 500, 0, resp.totalCount);
+        });
+      });
     });
 
     // Progress on HeaderMenuSpace
@@ -150,6 +146,26 @@ var STRINGS = {
     $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(progress);
     return event;
   });
+
+  function confirmSend(config) {
+    if (config.sandboxMode !== 'true') {
+      var title = getStrings(lang, 'confirm_sending');
+      var cancelButtonText = getStrings(lang, 'cancel');
+      var confirmButtonText = getStrings(lang, 'send');
+      return Swal.fire({
+        title: title,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: cancelButtonText,
+      });
+    } else {
+      return Swal.fire({
+        title: 'sandboxmode',
+        icon: 'info'
+      });
+    }
+  }
 
   // Initialize send mail process
   function initSendMail() {
@@ -171,10 +187,14 @@ var STRINGS = {
     var newCondition = condition + ' limit ' + limit + ' offset ' + offset;
     progress = offset / total;
     updateProgress(progress);
-    kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {app: appId, query: newCondition})
-    .then(function(respKintone){
-      sendMail(makeParams(respKintone.records, config, false))
-      .then(function(respSendMail) {
+    kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {app: appId, query: newCondition}).then(function(respKintone){
+      var param = makeParams(respKintone.records, config, false);
+      var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
+      if (!config.sandboxMode) sandboxMode = false;
+      if (sandboxMode) {
+        return Swal.fire({title: 'Request', type: 'info', grow: 'row', text: 'サンドボックスモード', input: 'textarea', inputValue: JSON.stringify(param, null , 2)}).then(finishProgress());
+      }
+      sendMail(param).then(function(respSendMail) {
         var newOffset = offset + limit;
         results.push(respSendMail);
         if (newOffset >= total) {
@@ -182,13 +202,11 @@ var STRINGS = {
         } else {
           processRecords(condition, limit, newOffset, total);
         }
-      })
-      .catch(function(respSendMail) {
+      }).catch(function(respSendMail) {
         results.push(respSendMail);
         showResults(results);
       });
-    })
-    .catch(function(respKintone) {
+    }).catch(function(respKintone) {
       showKintoneError(respKintone);
       return Promise.reject(respKintone);
     });
@@ -207,9 +225,9 @@ var STRINGS = {
     }
     if (hasFail) {
       mesFail = mesFail + '<br />' + mesDetail;
-      swal('Failed', mesFail, 'error').catch(swal.noop);
+      Swal.fire('Failed', mesFail, 'error');
     } else {
-      swal('Complete', mesSuccess, 'success').catch(swal.noop);
+      Swal.fire('Complete', mesSuccess, 'success');
     }
     finishProgress();
   }
@@ -218,12 +236,11 @@ var STRINGS = {
     var message = getStrings(lang, 'kintone_error');
     message = message + '<br />status: ' + respKintone.code;
     message = message + '<br />message: ' + respKintone.message;
-    swal('Failed', message, 'error');
+    Swal.fire('Failed', message, 'error');
   }
 
   // Make Mail Send Parameters
   function makeParams(records, config, sandbox_mode) {
-    console.log(JSON.stringify(records));
     var param = {};
     var personalizations = [];
     var templateGeneration = config.templateGeneration;
@@ -280,7 +297,6 @@ var STRINGS = {
       param.content = [];
       param.content.push({'type': 'text/plain', 'value': ' '});
     }
-    console.log(JSON.stringify(param));
     return param;
   }
 
@@ -319,7 +335,7 @@ var STRINGS = {
   kintone.events.on('app.record.index.edit.submit', function(event) {
     var title = getStrings(lang, 'warning_sending_title');
     var message = getStrings(lang, 'warning_sending_message');
-    swal(title, message, 'warning');
+    Swal.fire(title, message, 'warning');
     return event;
   });
 
