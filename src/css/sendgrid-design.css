@@ -116,6 +116,27 @@ ul.items {
   word-break: break-all;
 }
 
+.kintoneplugin-button-small {
+	display: inline-block;
+  box-sizing: border-box;
+  padding: 0 16px;
+  min-width: 48px;
+  height: 48px;
+  outline: none;
+  border: 1px solid #e3e7e8;
+  background-color: #f7f9fa;
+  box-shadow: 1px 1px 1px #fff inset;
+  color: #3498db;
+  text-align: center;
+  line-height: 48px;
+}
+
+.kintoneplugin-button-small:hover {
+  background-color: #c8d6dd;
+  box-shadow: none;
+  cursor: pointer;
+}
+
 .swal2-content {
 	word-break: break-all;
 }

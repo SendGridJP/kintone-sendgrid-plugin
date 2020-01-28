@@ -172,133 +172,129 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     });
 
     // Event : Select tempaltes function.
-    $('#template_select').change(function() {
+    $('#template_select').change(async function() {
       // Get version
-      getVersion($('#template_select').val());
+      await getVersion($('#template_select').val());
     });
 
     // Event : Select add substitution button.
-    $('#add-sub').on('click', function() {
-      kintone.api(kintone.api.url('/k/v1/form',true), 'GET', {app: appId}, function(resp) {
-        addSub('', '', resp);
-      });
+    $('#add-sub').on('click', async function() {
+      var resp = await kintone.api(
+        kintone.api.url('/k/v1/form',true), 'GET', {app: appId}
+      );
+      addSub('', '', resp);
     });
 
     // Event : Select add dynamic template data button
-    $('#add-dtd').on('click', function() {
-      kintone.api(kintone.api.url('/k/v1/form', true), 'GET', {app: appId}, function(resp) {
-        addDtd('', '', resp);
-      });
+    $('#add-dtd').on('click', async function() {
+      var resp = await kintone.api(
+        kintone.api.url('/k/v1/form', true), 'GET', {app: appId}
+      );
+      addDtd('', '', resp);
     });
 
     // Event : Click Save Button
-    $('#submit').on('click', function() {
+    $('#submit').on('click', async function() {
       // Required field check
       if (!$('#sendgrid_apikey').val()) {
-        swal('Error', getStrings(lang, 'sendgrid_apikey_required'), 'error');
-        return;
+        return Swal.fire('Error', getStrings(lang, 'sendgrid_apikey_required'), 'error');
       }
       if (!$('#from').val()) {
-        swal('Error', getStrings(lang, 'from_required'), 'error');
-        return;
+        return Swal.fire('Error', getStrings(lang, 'from_required'), 'error');
       }
       if (!$('#to_select').val()) {
-        swal('Error', getStrings(lang, 'to_required'), 'error');
-        return;
+        return Swal.fire('Error', getStrings(lang, 'to_required'), 'error');
       }
       if (!$('#template_select').val()) {
-        swal('Error', getStrings(lang, 'template_required'), 'error');
-        return;
+        return Swal.fire('Error', getStrings(lang, 'template_required'), 'error');
       }
       if (!$('input[name=template_generation]:checked').val()) {
-        swal('Error', getStrings(lang, 'template_generation_required'), 'error');
-        return;
+        return Swal.fire('Error', getStrings(lang, 'template_generation_required'), 'error');
       }
       // Validate API key
       var apiKeyAlert = $('#sendgrid_apikey_alert');
-      validateApiKey()
-        .then(function() {
-          apiKeyAlert.empty().hide();
-          // Save app config
-          var saveConfig = {};
-          saveConfig.from = $('#from').val();
-          saveConfig.fromName = $('#from_name').val();
-          saveConfig.contentType = $('input[name=content_type]:checked').val();
-          saveConfig.templateGeneration = $('input[name=template_generation]:checked').val();
-          saveConfig.templateName = $('#template_select').children(':selected').text();
-          saveConfig.templateId = $('#template_select').val();
-          saveConfig.emailFieldCode = $('#to_select').val();
-          saveConfig.toNameFieldCode = $('#to_name_select').val();
-          saveConfig.sandboxMode = String($('#sandbox_mode').prop('checked'));
-          // substitution tags
-          if (saveConfig.subNumber === undefined) {
-            saveConfig.subNumber = 0;
+      try {
+        await validateApiKey();
+        apiKeyAlert.empty().hide();
+        // Save app config
+        var saveConfig = {};
+        saveConfig.from = $('#from').val();
+        saveConfig.fromName = $('#from_name').val();
+        saveConfig.contentType = $('input[name=content_type]:checked').val();
+        saveConfig.templateGeneration = $('input[name=template_generation]:checked').val();
+        saveConfig.templateName = $('#template_select').children(':selected').text();
+        saveConfig.templateId = $('#template_select').val();
+        saveConfig.emailFieldCode = $('#to_select').val();
+        saveConfig.toNameFieldCode = $('#to_name_select').val();
+        saveConfig.sandboxMode = String($('#sandbox_mode').prop('checked'));
+        // substitution tags
+        if (saveConfig.subNumber === undefined) {
+          saveConfig.subNumber = 0;
+        }
+        for (var i = 0; i < saveConfig.subNumber; i++) {
+          delete saveConfig['val' + i];
+          delete saveConfig['code' + i];
+        }
+        var subContainer = $('#sub_container');
+        var subNumber = 0;
+        var subRows = subContainer.children('.sub-row');
+        for (var q = 0; q < subRows.length; q++) {
+          var subRow = subRows.eq(q);
+          var subKey = subRow.find('.sub-key').val();
+          var subVal = subRow.find('.sub-val').val();
+          if (subKey.match(EXP_SUB_TAG) === null) {
+            Swal.fire('Error', getStrings(lang, 'sub_tag_variable_error'), 'error');
+            return;
           }
-          for (var i = 0; i < saveConfig.subNumber; i++) {
-            delete saveConfig['val' + i];
-            delete saveConfig['code' + i];
+          saveConfig['val' + subNumber] = subKey;
+          saveConfig['code' + subNumber] = subVal;
+          subNumber++;
+        }
+        saveConfig.subNumber = String(subNumber);
+        // dynamic template data
+        if (saveConfig.dtdNumber === undefined) {
+          saveConfig.dtdNumber = 0;
+        }
+        for (var i = 0; i < saveConfig.dtdNumber; i++) {
+          delete saveConfig['dtd_key_' + i];
+          delete saveConfig['dtd_val_' + i];
+        }
+        var dtdContainer = $('#dtd_container');
+        var dtdNumber = 0;
+        var dtdRows = dtdContainer.children('.dtd-row');
+        for (var q = 0; q < dtdRows.length; q++) {
+          var dtdRow = dtdRows.eq(q);
+          var dtdKey = dtdRow.find('.dtd-key').val();
+          var dtdVal = dtdRow.find('.dtd-val').val();
+          if (dtdKey.match(EXP_DTD) === null) {
+            Swal.fire('Error', getStrings(lang, 'dtd_variable_error'), 'error');
+            return;
           }
-          var subContainer = $('#sub_container');
-          var subNumber = 0;
-          var subRows = subContainer.children('.sub-row');
-          for (var q = 0; q < subRows.length; q++) {
-            var subRow = subRows.eq(q);
-            var subKey = subRow.find('.sub-key').val();
-            var subVal = subRow.find('.sub-val').val();
-            if (subKey.match(EXP_SUB_TAG) === null) {
-              swal('Error', getStrings(lang, 'sub_tag_variable_error'), 'error');
-              return;
+          saveConfig['dtd_key_' + dtdNumber] = dtdKey;
+          saveConfig['dtd_val_' + dtdNumber] = dtdVal;
+          dtdNumber++;
+        }
+        saveConfig.dtdNumber = String(dtdNumber);
+        //console.log(saveConfig);
+        // Save proxy config
+        var headers = getHeaders();
+        kintone.plugin.app.setConfig(saveConfig, function(){
+          kintone.plugin.app.setProxyConfig(
+            'https://api.sendgrid.com/', 'POST', headers, {}, function() {
+              kintone.plugin.app.setProxyConfig(
+                'https://api.sendgrid.com/', 'GET', headers, {}
+              );
             }
-            saveConfig['val' + subNumber] = subKey;
-            saveConfig['code' + subNumber] = subVal;
-            subNumber++;
-          }
-          saveConfig.subNumber = String(subNumber);
-          // dynamic template data
-          if (saveConfig.dtdNumber === undefined) {
-            saveConfig.dtdNumber = 0;
-          }
-          for (var i = 0; i < saveConfig.dtdNumber; i++) {
-            delete saveConfig['dtd_key_' + i];
-            delete saveConfig['dtd_val_' + i];
-          }
-          var dtdContainer = $('#dtd_container');
-          var dtdNumber = 0;
-          var dtdRows = dtdContainer.children('.dtd-row');
-          for (var q = 0; q < dtdRows.length; q++) {
-            var dtdRow = dtdRows.eq(q);
-            var dtdKey = dtdRow.find('.dtd-key').val();
-            var dtdVal = dtdRow.find('.dtd-val').val();
-            if (dtdKey.match(EXP_DTD) === null) {
-              swal('Error', getStrings(lang, 'dtd_variable_error'), 'error');
-              return;
-            }
-            saveConfig['dtd_key_' + dtdNumber] = dtdKey;
-            saveConfig['dtd_val_' + dtdNumber] = dtdVal;
-            dtdNumber++;
-          }
-          saveConfig.dtdNumber = String(dtdNumber);
-          //console.log(saveConfig);
-          // Save proxy config
-          var headers = getHeaders();
-          kintone.plugin.app.setConfig(saveConfig, function(){
-            kintone.plugin.app.setProxyConfig(
-              'https://api.sendgrid.com/', 'POST', headers, {}, function() {
-                kintone.plugin.app.setProxyConfig(
-                  'https://api.sendgrid.com/', 'GET', headers, {}
-                );
-              }
-            );
-          });
-        })
-        .catch(function(reason) {
-          apiKeyAlert.empty().hide();
-          var text = getStrings(lang, 'sendgrid_apikey_alert');
-          swal('Error', text + reason, 'error');
-          $('#sendgrid_apikey_alert')
-            .append($('<p />', {text: text + reason}))
-            .show();
+          );
         });
+      } catch(err) {
+        apiKeyAlert.empty().hide();
+        var text = getStrings(lang, 'sendgrid_apikey_alert');
+        Swal.fire('Error', text + err.message, 'error');
+        $('#sendgrid_apikey_alert')
+          .append($('<p />', {text: text + err.message}))
+          .show();
+      }
     });
 
     // Event : Click Cancel Button
@@ -347,7 +343,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#cancel_btn').text(getStrings(lang, 'cancel_btn'));
   }
 
-  function showConfigData(config) {
+  async function showConfigData(config) {
     // API key
     var cg = kintone.plugin.app.getProxyConfig('https://api.sendgrid.com/', 'POST');
     if (cg !== null) {
@@ -355,16 +351,15 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       if (apiKey[1].length > 0) {
         $('#sendgrid_apikey').val(apiKey[1]);
       }
-      validateApiKey()
-        .then(function() {
-          $('#sendgrid_apikey_alert').empty().hide();
-        })
-        .catch(function(reason) {
-          var text = getStrings(lang, 'sendgrid_apikey_alert');
-          $('#sendgrid_apikey_alert')
-            .append($('<p />', {text: text + reason}))
-            .show();
-        });
+      try {
+        await validateApiKey();
+        $('#sendgrid_apikey_alert').empty().hide();
+      } catch(err) {
+        var text = getStrings(lang, 'sendgrid_apikey_alert');
+        $('#sendgrid_apikey_alert')
+          .append($('<p />', {text: text + err.message}))
+          .show();
+      }
     }
     // from
     $('#from').val(config.from);
@@ -397,28 +392,25 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     // Refresh optional settings
     refreshOptionalSettings(templateGeneration);
     // Show kintone data
-    showKintoneData();
+    await showKintoneData();
   }
 
-  function validateApiKey() {
+  async function validateApiKey() {
     var url = 'https://api.sendgrid.com/v3/scopes';
-    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
-      var response = JSON.parse(resp[0]);
-      var status = resp[1];
-      if (status !== 200) {
-        return Promise.reject('Http error: ' + status + ', ' + JSON.stringify(response));
+    var resp = await kintone.proxy(url, 'GET', getHeaders(), {});
+    var response = JSON.parse(resp[0]);
+    var status = resp[1];
+    if (status !== 200) {
+      throw new Error('Http error: ' + status + ', ' + JSON.stringify(response));
+    }
+    if (response.errors === undefined && response.scopes.length > 0) {
+      if (($.inArray('mail.send', response.scopes) < 0) ||
+          ($.inArray('templates.read', response.scopes) < 0)) {
+        throw new Error('Lack of scopes: ' + JSON.stringify(response.scopes));
       }
-      if (response.errors === undefined && response.scopes.length > 0) {
-        if (($.inArray('mail.send', response.scopes) < 0) ||
-            ($.inArray('templates.read', response.scopes) < 0)) {
-          return Promise.reject('Lack of scopes: ' + JSON.stringify(response.scopes));
-        }
-        return Promise.resolve('success');
-      }
-      return Promise.reject('Unknown response: ' + status + ', ' + JSON.stringify(response));
-    }, function(e) {
-      return Promise.reject('Unknown error:: ' + JSON.stringify(e));
-    });
+      return response;
+    }
+    throw new Error('Unknown response: ' + status + ', ' + JSON.stringify(response));
   }
 
   function getHeaders() {
@@ -428,24 +420,21 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     return headers;
   }
 
-  function getTemplates(generation) {
+  async function getTemplates(generation) {
     var url = 'https://api.sendgrid.com/v3/templates?generations=' + generation;
-    return kintone.proxy(url, 'GET', getHeaders(), {}).then(function(resp) {
-      var response = JSON.parse(resp[0]);
-      var status = resp[1];
-      if (status !== 200) {
-        return Promise.reject('Http error: ' + status + ', ' + JSON.stringify(response));
-      }
-      if (response.errors === undefined && response.templates.length > 0) {
-        return Promise.resolve(response.templates);
-      }
-      return Promise.reject('Unknown response: ' + status + ', ' + JSON.stringify(response));
-    }, function(e) {
-      return Promise.reject('Unknown error:: ' + JSON.stringify(e));
-    });
+    var resp = await kintone.proxy(url, 'GET', getHeaders(), {});
+    var response = JSON.parse(resp[0]);
+    var status = resp[1];
+    if (status !== 200) {
+      throw new Error('Http error: ' + status + ', ' + JSON.stringify(response));
+    }
+    if (response.errors === undefined && response.templates.length > 0) {
+      return response.templates;
+    }
+    throw new Error('Unknown response: ' + status + ', ' + JSON.stringify(response));
   }
 
-  function refreshTemplatesSpace(generation) {
+  async function refreshTemplatesSpace(generation) {
     // Template Edit Link
     if (generation === 'legacy') {
       $('#template_edit_label').attr('href', 'https://sendgrid.com/templates');
@@ -455,52 +444,50 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     // Templates
     var templateSelect = $('#template_select');
     var alert = $('#template_select_alert');
-    getTemplates(generation)
-      .then(function(templates){
-        alert.empty().hide();
-        templateSelect.empty();
-        for (var m = 0; m < templates.length; m++) {
-          var template = templates[m];
-          for (var n = 0; n < template.versions.length; n++) {
-            var version = template.versions[n];
-            if (version.active === 1) {
-              var selected = (config.templateId === template.id);
-              var option = $('<option />', {
-                value: template.id,
-                text: template.name,
-                selected: selected,
-                'class': 'goog-inline-block goog-menu-button-inner-box'
-              });
-              templateSelect.append(option);
-              break;
-            }
+    try {
+      var templates = await getTemplates(generation);
+      alert.empty().hide();
+      templateSelect.empty();
+      for (var m = 0; m < templates.length; m++) {
+        var template = templates[m];
+        for (var n = 0; n < template.versions.length; n++) {
+          var version = template.versions[n];
+          if (version.active === 1) {
+            var selected = (config.templateId === template.id);
+            var option = $('<option />', {
+              value: template.id,
+              text: template.name,
+              selected: selected,
+              'class': 'goog-inline-block goog-menu-button-inner-box'
+            });
+            templateSelect.append(option);
+            break;
           }
         }
-        getVersion($('#template_select').val());
-      })
-      .catch(function(reason) {
-        var text = getStrings(lang, 'template_select_alert');
-        alert.empty();
-        templateSelect.empty();
-        $('#template_result_subject').empty();
-        $('#template_result_text').empty();
-        $('#template_result_iframe').prop('srcdoc', '');
-        alert.append($('<p />', {text: text + reason})).show();
-      });
+      }
+      await getVersion($('#template_select').val());
+    } catch(err) {
+      var text = getStrings(lang, 'template_select_alert');
+      alert.empty();
+      templateSelect.empty();
+      $('#template_result_subject').empty();
+      $('#template_result_text').empty();
+      $('#template_result_iframe').prop('srcdoc', '');
+      alert.append($('<p />', {text: text + err})).show();
+    }
   }
 
-  function getVersion(templateId) {
+  async function getVersion(templateId) {
     var url = 'https://api.sendgrid.com/v3/templates/' + templateId;
-    kintone.proxy(url, 'GET', getHeaders(), {}, function(resp) {
-      var response = JSON.parse(resp);
-      for (var n = 0; n < response.versions.length; n++) {
-        if (response.versions[n].active == 1) {
-          $('#template_result_subject').text(response.versions[n].subject);
-          $('#template_result_text').text(response.versions[n].plain_content);
-          $('#template_result_iframe').prop('srcdoc', response.versions[n].html_content);
-        }
+    var resp = await kintone.proxy(url, 'GET', getHeaders(), {});
+    var response = JSON.parse(resp[0]);
+    for (var n = 0; n < response.versions.length; n++) {
+      if (response.versions[n].active == 1) {
+        $('#template_result_subject').text(response.versions[n].subject);
+        $('#template_result_text').text(response.versions[n].plain_content);
+        $('#template_result_iframe').prop('srcdoc', response.versions[n].html_content);
       }
-    });
+    }
   }
 
   function refreshOptionalSettings(generation) {
@@ -513,50 +500,49 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     }
   }
 
-  function getKintoneFields() {
-    return kintone.api(kintone.api.url('/k/v1/form',true), 'GET', {app: appId}).then(function(resp) {
-      return resp;
-    });
+  async function getKintoneFields() {
+    return await kintone.api(
+      kintone.api.url('/k/v1/form',true), 'GET', {app: appId}
+    );
   }
 
-  function showKintoneData() {
-    return getKintoneFields().then(function(resp) {
-      var toSelect = $('#to_select');
-      var toNameSelect = $('#to_name_select');
-      toNameSelect.append($('<option/>'));
-      var knFields = resp.properties;
+  async function showKintoneData() {
+    var resp = await getKintoneFields();
+    var toSelect = $('#to_select');
+    var toNameSelect = $('#to_name_select');
+    toNameSelect.append($('<option/>'));
+    var knFields = resp.properties;
 
-      for (var i = 0; i < knFields.length; i++) {
-        if (isTextField(knFields[i])) {
-          // To
-          var opTo = $('<option/>');
-          opTo.attr('value', knFields[i].code);
-          if (config.emailFieldCode === knFields[i].code) {
-            opTo.prop('selected', true);
-          }
-          opTo.text(
-            knFields[i].label + '(' + knFields[i].code + ')'
-          );
-          toSelect.append(opTo);
-          // To name
-          var opToName = $('<option/>');
-          opToName.attr('value', knFields[i].code);
-          if (config.toNameFieldCode === knFields[i].code) {
-            opToName.prop('selected', true);
-          }
-          opToName.text(
-            knFields[i].label + '(' + knFields[i].code + ')'
-          );
-          toNameSelect.append(opToName);
+    for (var i = 0; i < knFields.length; i++) {
+      if (isTextField(knFields[i])) {
+        // To
+        var opTo = $('<option/>');
+        opTo.attr('value', knFields[i].code);
+        if (config.emailFieldCode === knFields[i].code) {
+          opTo.prop('selected', true);
         }
+        opTo.text(
+          knFields[i].label + '(' + knFields[i].code + ')'
+        );
+        toSelect.append(opTo);
+        // To name
+        var opToName = $('<option/>');
+        opToName.attr('value', knFields[i].code);
+        if (config.toNameFieldCode === knFields[i].code) {
+          opToName.prop('selected', true);
+        }
+        opToName.text(
+          knFields[i].label + '(' + knFields[i].code + ')'
+        );
+        toNameSelect.append(opToName);
       }
-      for (var k = 0; k < config.subNumber; k++) {
-        addSub(config['val' + k], config['code' + k], resp);
-      }
-      for (var k = 0; k < config.dtdNumber; k++) {
-        addDtd(config['dtd_key_' + k], config['dtd_val_' + k], resp);
-      }
-    });
+    }
+    for (var k = 0; k < config.subNumber; k++) {
+      addSub(config['val' + k], config['code' + k], resp);
+    }
+    for (var k = 0; k < config.dtdNumber; k++) {
+      addDtd(config['dtd_key_' + k], config['dtd_val_' + k], resp);
+    }
   }
 
   function addSub(default_val, default_code, resp) {
@@ -610,8 +596,15 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     // Clear block
     var clearBlock = $('<div/>').addClass('child-vertical-center')
       .append(
-        $('<a/>').addClass('clear-sub-row').addClass('link-button').prop('href', '#')
-          .append($('<i/>').addClass('material-icons').text('clear'))
+        $('<a/>')
+        .addClass('clear-sub-row')
+        .addClass('link-button')
+        .prop('href', '#')
+        .append(
+          $('<i/>')
+          .addClass('material-icons')
+          .text('clear')
+        )
       );
     valDiv.append(valSelect);
     valInput.append(valDiv);

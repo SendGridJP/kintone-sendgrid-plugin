@@ -37,15 +37,13 @@ var STRINGS = {
   var userInfo = kintone.getLoginUser();
   //appId
   var appId = kintone.app.getId();
-  // SendMail results
-  var results = [];
   // SendMail progress
   var progress = 0;
   //
   var lang = userInfo.language;
 
   // Event : Record show
-  kintone.events.on('app.record.index.show', function(event) {
+  kintone.events.on('app.record.index.show', async function(event) {
     if ($('#send_mail').length > 0) {
       return event;
     }
@@ -85,24 +83,23 @@ var STRINGS = {
     }
 
     // Get Templates
-    var templates = getTemplates(templateGeneration).then(function(templates){
-      for (var m = 0; m < templates.length; m++) {
-        var template = templates[m];
-        for (var n = 0; n < template.versions.length; n++) {
-          var version = template.versions[n];
-          if (version.active === 1) {
-            var selected = (config.templateId === template.id);
-            var option = $('<option />', {
-              value: template.id,
-              text: template.name,
-              selected: selected,
-              'class': 'goog-inline-block goog-menu-button-inner-box'
-            });
-            templateSpace.append(option);
-          }
+    var templates = await getTemplates(templateGeneration);
+    for (var m = 0; m < templates.length; m++) {
+      var template = templates[m];
+      for (var n = 0; n < template.versions.length; n++) {
+        var version = template.versions[n];
+        if (version.active === 1) {
+          var selected = (config.templateId === template.id);
+          var option = $('<option />', {
+            value: template.id,
+            text: template.name,
+            selected: selected,
+            'class': 'goog-inline-block goog-menu-button-inner-box'
+          });
+          templateSpace.append(option);
         }
       }
-    });
+    }
 
     // Send Button on HeaderMenuSpace
     var records = event.records;
@@ -119,22 +116,27 @@ var STRINGS = {
     $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(sendButton);
 
     // Send Mail
-    $('#send_mail').on('click', function() {
-      if (records.length == 0) return;
-      // confirm before send
-      confirmSend(config).then(function(result) {
+    $('#send_mail').on('click', async function() {
+      try {
+        initProgress();
+        if (records.length == 0) return;
+        var result = await confirmSend(config);
         // cancel
         if (!result.value) return;
         // send mail
         var condition= kintone.app.getQueryCondition();
-        kintone.api(
+        var resp = await kintone.api(
           kintone.api.url('/k/v1/records', true), 'GET',
-          {app: appId, query: condition, totalCount: true})
-        .then(function(resp) {
-          initSendMail();
-          processRecords(condition, 500, 0, resp.totalCount);
-        });
-      });
+          {app: appId, query: condition, totalCount: true}
+        );
+        await processRecords(condition, 500, 0, resp.totalCount);
+        // Finish to send
+        Swal.fire('Complete', getStrings(lang, 'request_successed'), 'success');
+      } catch(err) {
+        Swal.fire('Failed', err.message, 'error');
+      } finally {
+        finishProgress();
+      }
     });
 
     // Progress on HeaderMenuSpace
@@ -168,8 +170,7 @@ var STRINGS = {
   }
 
   // Initialize send mail process
-  function initSendMail() {
-    results = [];
+  function initProgress() {
     progress = 0;
     $('#progress').show();
   }
@@ -183,60 +184,31 @@ var STRINGS = {
   }
 
   //　Handle Many Records
-  function processRecords(condition, limit, offset, total) {
+  async function processRecords(condition, limit, offset, total) {
     var newCondition = condition + ' limit ' + limit + ' offset ' + offset;
     progress = offset / total;
     updateProgress(progress);
-    kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {app: appId, query: newCondition}).then(function(respKintone){
-      var param = makeParams(respKintone.records, config, false);
-      var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
-      if (!config.sandboxMode) sandboxMode = false;
-      if (sandboxMode) {
-        return Swal.fire({title: 'Request', type: 'info', grow: 'row', text: 'サンドボックスモード', input: 'textarea', inputValue: JSON.stringify(param, null , 2)}).then(finishProgress());
-      }
-      sendMail(param).then(function(respSendMail) {
-        var newOffset = offset + limit;
-        results.push(respSendMail);
-        if (newOffset >= total) {
-          showResults(results);
-        } else {
-          processRecords(condition, limit, newOffset, total);
-        }
-      }).catch(function(respSendMail) {
-        results.push(respSendMail);
-        showResults(results);
-      });
-    }).catch(function(respKintone) {
-      showKintoneError(respKintone);
-      return Promise.reject(respKintone);
-    });
-  }
-
-  function showResults(results) {
-    var mesSuccess = getStrings(lang, 'request_successed');
-    var mesFail = getStrings(lang, 'request_failed');
-    var mesDetail = '';
-    var hasFail = false;
-    for (var i = 0; i < results.length; i++) {
-      var response = results[i][0];
-      var status = results[i][1];
-      mesDetail = mesDetail + '<br />' + response;
-      if (status >= 400) hasFail = true;
+    try {
+      var respKintone = await kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {app: appId, query: newCondition});
+    } catch(err) {
+      // Handling the kintone Error
+      var message = getStrings(lang, 'kintone_error');
+      message = message + '<br />status: ' + err.code;
+      message = message + '<br />message: ' + err.message;
+      throw new Error(message);
     }
-    if (hasFail) {
-      mesFail = mesFail + '<br />' + mesDetail;
-      Swal.fire('Failed', mesFail, 'error');
-    } else {
-      Swal.fire('Complete', mesSuccess, 'success');
+    var param = makeParams(respKintone.records, config, false);
+    var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
+    if (!config.sandboxMode) sandboxMode = false;
+    if (sandboxMode) {
+      return Swal.fire({title: 'Request', icon: 'info', grow: 'row', text: 'サンドボックスモード', input: 'textarea', inputValue: JSON.stringify(param, null , 2)});
     }
-    finishProgress();
-  }
-
-  function showKintoneError(respKintone) {
-    var message = getStrings(lang, 'kintone_error');
-    message = message + '<br />status: ' + respKintone.code;
-    message = message + '<br />message: ' + respKintone.message;
-    Swal.fire('Failed', message, 'error');
+    await sendMail(param);
+    var newOffset = offset + limit;
+    if (newOffset < total) {
+      // continue to send
+      return await processRecords(condition, limit, newOffset, total);
+    }
   }
 
   // Make Mail Send Parameters
@@ -301,35 +273,25 @@ var STRINGS = {
   }
 
   //Send mail function
-  function sendMail(param) {
+  async function sendMail(param) {
     var url = 'https://api.sendgrid.com/v3/mail/send';
     var data = JSON.stringify(param);
-    return kintone.plugin.app.proxy(PLUGIN_ID, url, 'POST', {}, data)
-    .then(function(resp) {
-      var response = resp[0];
-      var status = resp[1];
-      if (status < 400) return resp;
-      else return Promise.reject(resp);
-    })
-    .catch(function(resp) {
-      return Promise.reject(resp);
-    });
+    var resp = await kintone.plugin.app.proxy(PLUGIN_ID, url, 'POST', {}, data);
+    var status = resp[1];
+    if (status < 400) return resp;
+    var response = JSON.parse(resp[0]);
+    var message = getStrings(lang, 'request_failed') + '<br/>' + JSON.stringify(response.errors);
+    throw new Error(message);
   }
 
   // Get Templates
-  function getTemplates(generation) {
+  async function getTemplates(generation) {
     var url = 'https://api.sendgrid.com/v3/templates?generations=' + generation;
-    return kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {}).then(function(resp) {
-      var response = JSON.parse(resp[0]);
-      if (response.templates.length > 0 && response.errors === undefined) {
-        return response.templates;
-      }
-      console.log('getTemplates: Fail: ' + JSON.stringify(response.errors));
-      return [];
-    }, function(e) {
-      console.log('getTemplates: Fail: ' + JSON.stringify(e));
-      return [];
-    });
+    var resp = await kintone.plugin.app.proxy(PLUGIN_ID, url, 'GET', {}, {});
+    var response = JSON.parse(resp[0]);
+    var status = resp[1];
+    if (status < 400) return response.templates;
+    throw new Error(JSON.stringify(response.errors));
   }
 
   kintone.events.on('app.record.index.edit.submit', function(event) {
