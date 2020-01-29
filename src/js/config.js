@@ -73,7 +73,8 @@ var STRINGS = {
     'to_required': 'Toフィールドは必須です',
     'template_required': 'メールテンプレートは必須です',
     'template_generation_required': 'テンプレート種別の選択は必須です',
-    'kintone_field': 'kintoneのフィールド'
+    'kintone_field': 'kintoneのフィールド',
+    'dtd_help_label':'Dynamic Template Dataに設定するパラメータを「キー：値」形式で指定します。'
   },
   'default': {
     'title_label': 'SendGrid Plug-in Settings',
@@ -115,7 +116,8 @@ var STRINGS = {
     'to_required': 'To field is required',
     'template_required': 'Mail Template is required',
     'template_generation_required': 'Template type is required',
-    'kintone_field': 'kintone Field'
+    'kintone_field': 'kintone Field',
+    'dtd_help_label': 'Add the parameters to be set in Dynamic Template Data by [key: value] format.'
   }
 };
 
@@ -341,6 +343,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#dtd_title_label').text(getStrings(lang, 'dtd_title_label'));
     $('#save_btn').text(getStrings(lang, 'save_btn'));
     $('#cancel_btn').text(getStrings(lang, 'cancel_btn'));
+    $('#dtd_help_label').text(getStrings(lang, 'dtd_help_label'));
   }
 
   async function showConfigData(config) {
