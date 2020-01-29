@@ -8,7 +8,10 @@ var STRINGS = {
     'send': '送信',
     'request_parameters': 'リクエストパラメータ',
     'sandbox_mode': 'サンドボックスモード',
-    'request_successed': 'メールの送信リクエストに成功しました。',
+    'sandbox_mode_message': 'メールの送信リクエストのパラメータチェックを行います。メールは送信しません。',
+    'request_succeeded': 'メールの送信リクエストに成功しました。',
+    'validation_succeeded': 'メールの送信リクエストのチェックに成功しました。',
+    'request': 'メールの送信リクエスト',
     'request_failed': 'メールの送信リクエストに失敗しました。',
     'kintone_error': 'Kintoneエラー。',
     'warning_sending_title': 'メールを送信する前に画面をリロードしてください',
@@ -21,7 +24,10 @@ var STRINGS = {
     'send': 'Send',
     'request_parameters': 'Request parameters',
     'sandbox_mode': 'Sandbox mode',
-    'request_successed': 'Your requests for mail sending were successful.',
+    'sandbox_mode_message': 'Validate the parameters for Mail Send API. It doesn\'t send any email.',
+    'request_succeeded': 'Your requests for mail sending were successful.',
+    'validation_succeeded': 'The validation for Mail Send API parameters were successful.',
+    'request': 'Request',
     'request_failed': 'Your requests for mail sending were failed.',
     'kintone_error': 'Kintone error.',
     'warning_sending_title': 'Before mail will be sending, reloading is required.',
@@ -120,7 +126,8 @@ var STRINGS = {
       try {
         initProgress();
         if (records.length == 0) return;
-        var result = await confirmSend(config);
+        var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
+        var result = await confirmSend(sandboxMode);
         // cancel
         if (!result.value) return;
         // send mail
@@ -131,7 +138,11 @@ var STRINGS = {
         );
         await processRecords(condition, 500, 0, resp.totalCount);
         // Finish to send
-        Swal.fire('Complete', getStrings(lang, 'request_successed'), 'success');
+        if (sandboxMode) {
+          Swal.fire('Complete', getStrings(lang, 'validation_succeeded'), 'success');
+        } else {
+          Swal.fire('Complete', getStrings(lang, 'request_succeeded'), 'success');
+        }
       } catch(err) {
         Swal.fire('Failed', err.message, 'error');
       } finally {
@@ -149,8 +160,17 @@ var STRINGS = {
     return event;
   });
 
-  function confirmSend(config) {
-    if (config.sandboxMode !== 'true') {
+  function confirmSend(sandboxMode) {
+    if (sandboxMode) {
+      return Swal.fire({
+        title: getStrings(lang, 'sandbox_mode'),
+        text: getStrings(lang, 'sandbox_mode_message'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: getStrings(lang, 'cancel')
+      });
+    } else {
       var title = getStrings(lang, 'confirm_sending');
       var cancelButtonText = getStrings(lang, 'cancel');
       var confirmButtonText = getStrings(lang, 'send');
@@ -160,11 +180,6 @@ var STRINGS = {
         showCancelButton: true,
         confirmButtonText: confirmButtonText,
         cancelButtonText: cancelButtonText,
-      });
-    } else {
-      return Swal.fire({
-        title: 'sandboxmode',
-        icon: 'info'
       });
     }
   }
@@ -197,11 +212,14 @@ var STRINGS = {
       message = message + '<br />message: ' + err.message;
       throw new Error(message);
     }
-    var param = makeParams(respKintone.records, config, false);
     var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
-    if (!config.sandboxMode) sandboxMode = false;
+    var param = makeParams(respKintone.records, config, sandboxMode);
     if (sandboxMode) {
-      return Swal.fire({title: 'Request', icon: 'info', grow: 'row', text: 'サンドボックスモード', input: 'textarea', inputValue: JSON.stringify(param, null , 2)});
+      await Swal.fire(
+        {
+          title: 'Request', icon: 'info', grow: 'row', text: getStrings(lang, 'request'), input: 'textarea', inputValue: JSON.stringify(param, null , 2)
+        }
+      );
     }
     await sendMail(param);
     var newOffset = offset + limit;
