@@ -1,5 +1,12 @@
 jQuery.noConflict();
 
+var FIELD_TYPE_EMAIL = [
+  'SINGLE_LINE_TEXT',
+  'RADIO_BUTTON',
+  'DROP_DOWN',
+  'LINK'
+];
+
 var FIELD_TYPE_TEXT = [
   'RECORD_NUMBER',
   '__ID__',
@@ -156,6 +163,12 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
         if (index == clicked) $(element).addClass('active');
         else $(element).removeClass('active');
       });
+    });
+
+    // Event : Select Content Type
+    $('input[name="content_type"]:radio').on('change', function() {
+      var contentType = $('input[name="content_type"]:checked').val();
+      refreshContentSpace(contentType);
     });
 
     // Event : Select Template Generation
@@ -369,11 +382,16 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     // from name
     $('#from_name').val(config.fromName);
     // Content type
-    if (config.contentType !== 'text/plain') {
-      $('#content_type_multipart').prop('checked', true);
-    } else {
-      $('#content_type_plain').prop('checked', true);
+    var contentType = config.contentType;
+    if (!config.contentType) {
+      contentType = 'multipart/alternative';
     }
+    if (contentType === 'text/plain') {
+      $('#content_type_plain').prop('checked', true);
+    } else {
+      $('#content_type_multipart').prop('checked', true);
+    }
+    refreshContentSpace(contentType);
     // Template generation
     var templateGeneration = config.templateGeneration;
     if (!config.templateGeneration) {
@@ -421,6 +439,15 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     headers.Authorization = 'Bearer ' + $('#sendgrid_apikey').val();
     headers['Content-Type'] = 'application/json';
     return headers;
+  }
+
+  function refreshContentSpace(contentType) {
+    var htmlContainer = $('#template_html_container');
+    if (contentType === 'text/plain') {
+      htmlContainer.hide();
+    } else {
+      htmlContainer.show();
+    }
   }
 
   async function getTemplates(generation) {
@@ -517,7 +544,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     var knFields = resp.properties;
 
     for (var i = 0; i < knFields.length; i++) {
-      if (isTextField(knFields[i])) {
+      if (isEmailField(knFields[i])) {
         // To
         var opTo = $('<option/>');
         opTo.attr('value', knFields[i].code);
@@ -528,6 +555,8 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
           knFields[i].label + '(' + knFields[i].code + ')'
         );
         toSelect.append(opTo);
+      }
+      if (isTextField(knFields[i])) {
         // To name
         var opToName = $('<option/>');
         opToName.attr('value', knFields[i].code);
@@ -705,6 +734,10 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       valOption.prop('selected', true);
     }
     return valOption;
+  }
+
+  function isEmailField(field) {
+    return (FIELD_TYPE_EMAIL.indexOf(field.type) >= 0);
   }
 
   function isTextField(field) {
