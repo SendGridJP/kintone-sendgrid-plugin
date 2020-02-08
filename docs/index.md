@@ -17,6 +17,9 @@
 # 前提条件
 - [kintone](https://kintone.cybozu.com/jp/)のシステム管理権限を持ったアカウント
 - [SendGrid](https://sendgrid.kke.co.jp)のアカウント
+- 以下いずれかのブラウザ
+  - [Google Chrome](https://www.google.com/intl/ja_jp/chrome/)
+  - [mozilla firefox](https://www.mozilla.org/ja/firefox/)
 
 # 利用方法
 
@@ -80,9 +83,32 @@ Legacyテンプレートを選択した場合、置換設定が利用できま�
 ### 3-6-2. Dynamic Template Data設定
 Dynamicテンプレートを選択した場合、Dynamic Template Data設定が利用できます。Dynamic Template Data設定では、テンプレート上のタグと対応するkintoneフィールドを指定します。この設定を利用することで、メール本文に宛先ごとに異なる文字列をkintoneのフィールドから取得して埋め込んだり、if句の条件指定やイテレータを利用することができます。
 
-以下はメール本文中の「%name%」タグをkintoneの名前フィールドの値で置換してメール送信する例です。
+#### 3-6-2-1. 文字列の置換
 
-[![](images/15-6.png)](images/15-6.png)
+メール本文や件名にkintoneフォールドの値を埋め込む場合、テンプレートにタグを `{{}}` でくくった文字列を埋め込みます（例： `{{name}}`）。
+一方、Dynamic Template Data設定で、タグとそれに対応するkintoneフィールドを選択します。
+以下はメール本文中の「`name`」タグをkintoneの「名前」フィールドの値で置換してメール送信する例です。
+
+[![](images/15-6-1.png)](images/15-6-1.png)
+[![](images/15-6-2.png)](images/15-6-2.png)
+[![](images/15-6-3.png)](images/15-6-3.png)
+
+#### 3-6-2-2. if〜else句
+
+kintoneのデータでif~else句を制御する場合、テンプレートにタグと共にif句を記載します（例： `{{#if coupon}}` 〜 `{{/if}}`）。
+一方、Dynamic Template Data設定で、タグとそれに対応するkintoneフィールドを選択します。if句の制御に利用することのできるkintoneフィールドはフィールドの値が空の場合にnullを返すフィールドのみです（通常、「ドロップダウン型」を利用します）。null=falseまたはそれ以外の値=trueと扱われる挙動を利用しています。詳しくは[kintoneのドキュメント](https://developer.cybozu.io/hc/ja/articles/202166330)をご参照ください。
+
+[![](images/15-6-4.png)](images/15-6-4.png)
+[![](images/15-6-5.png)](images/15-6-5.png)
+
+#### 3-6-2-3. イテレータ
+
+タグに対応する値として配列データを返すkintoneフィールドを指定するとイテレータが利用できます。
+まず、テンプレートにタグと共にeach句を記載します（例： `{{#each albums}}` 〜 `{{/each}}`）。
+一方、Dynamic Template Data設定で、タグとそれに対応するkintoneフィールドを選択します。イテレータに利用することのできるkintoneフィールドは配列を返すフィールドのみです。詳しくは[kintoneのドキュメント](https://developer.cybozu.io/hc/ja/articles/202166330)をご参照ください。
+
+[![](images/15-6-6.png)](images/15-6-6.png)
+[![](images/15-6-7.png)](images/15-6-7.png)
 
 ### 3-5. 設定の保存
 

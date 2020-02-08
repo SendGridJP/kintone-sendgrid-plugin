@@ -53,15 +53,23 @@ var STRINGS = {
     if ($('#send_mail').length > 0) {
       return event;
     }
+    var templateGeneration = config.templateGeneration;
+    if (!config.templateGeneration) {
+      templateGeneration = 'legacy';
+    }
     // Label on HeaderMenuSpace
     var labelIcon = $('<i />', {
       text: 'mail',
       'class': 'material-icons vertical-align-middle'
     });
-    var labelText = getStrings(lang, 'template_label');;
+    var labelText = getStrings(lang, 'template_label');
+    var url = 'https://sendgrid.com/templates';
+    if (templateGeneration === 'dynamic') {
+      url = 'https://mc.sendgrid.com/dynamic-templates';
+    }
     var labelTemplate = $('<a />', {
       text: labelText,
-      href: 'https://sendgrid.com/templates',
+      href: url,
       target: '_blank',
       'class': 'header-menu-item'
     });
@@ -82,11 +90,6 @@ var STRINGS = {
     templateDiv.append(templateSpace);
     templateOuter.append(templateDiv);
     $(kintone.app.getHeaderMenuSpaceElement()).append(templateOuter);
-
-    var templateGeneration = config.templateGeneration;
-    if (!config.templateGeneration) {
-      templateGeneration = 'legacy';
-    }
 
     // Get Templates
     var templates = await getTemplates(templateGeneration);
