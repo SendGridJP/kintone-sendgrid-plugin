@@ -217,14 +217,16 @@ var STRINGS = {
     }
     var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
     var param = makeParams(respKintone.records, config, sandboxMode);
-    if (sandboxMode) {
-      await Swal.fire(
-        {
-          title: 'Request', icon: 'info', grow: 'row', text: getStrings(lang, 'request'), input: 'textarea', inputValue: JSON.stringify(param, null , 2)
-        }
-      );
+    if (param.personalizations.length > 0) {
+      if (sandboxMode) {
+        await Swal.fire(
+          {
+            title: 'Request', icon: 'info', grow: 'row', text: getStrings(lang, 'request'), input: 'textarea', inputValue: JSON.stringify(param, null , 2)
+          }
+        );
+      }
+      await sendMail(param);
     }
-    await sendMail(param);
     var newOffset = offset + limit;
     if (newOffset < total) {
       // continue to send
