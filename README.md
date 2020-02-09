@@ -8,10 +8,10 @@ This plug-in enables kintone to send Emails through SendGrid.
 See [here](https://sendgridjp.github.io/kintone-sendgrid-plugin/) in Japanese.
 
 ## Usage
-1. Make Email templates in SendGrid. You can use substitution tags in the templates.
+1. Make Email templates in SendGrid. Both dynamic and legacy templates are supported.
 2. Install this plug-in into your environment.
-3. Add this plug-in into kintone apps that you want to send emails.
-4. Set general settings in the SendGrid plug-in settings.
+3. Add this plug-in into kintone apps which send emails from.
+4. Set general settings in the SendGrid plug-in.
 
 ### API Keys
 1. Create an API key on the SendGrid web portal.
@@ -19,20 +19,22 @@ See [here](https://sendgridjp.github.io/kintone-sendgrid-plugin/) in Japanese.
 
 ### Mail settings
 1. Enter the From address into the SendGrid plug-in settings.
-2. Select the kintone field for the To. The To field should be [Text(single-line)] or the [Link(Type is E-mail address)] field which is prohibited duplicate values for the recipient address.
+2. Select the kintone field for the To.
 
 ### Template settings
-1. Click the Get a list of Templates button.
-2. Select the default template name.
+1. Select the default template name.
 
-### Substitution tags settings (Optional)
-1. Click the Add Substitution tag button.
-2. Enter the substitution tag which you want to substitute in the email.
-3. Select the kintone field for the substitution tag.
+### Substitution tags settings and Dynamic template data settings (Optional)
+1. Click the [+] button for adding option parameters.
+2. Enter the tag which you want to use in the templates.
+3. Select the kintone field for the tag.
 
 ## Requirement
 * SendGrid account.
-* Kintone account.
+* kintone account.
+* Browser
+  * Google Chrome
+  * Mozzila firefox
 
 ## Development
 1. Cloning the repository to any folder.
