@@ -1,6 +1,6 @@
 {
     "manifest_version": 1,
-    "version": 10,
+    "version": 11,
     "type": "APP",
     "name": {
         "ja": "SendGrid プラグイン",
@@ -12,7 +12,7 @@
         "en": "This plug-in enables kintone to send emails through SendGrid.",
         "zh": "This plug-in enables kintone to send emails through SendGrid."
     },
-    "icon": "image/image.png",
+    "icon": "image/logo.png",
     "homepage_url": {
         "ja": "https://sendgrid.com/",
         "en": "https://sendgrid.com/",
@@ -21,30 +21,32 @@
     "desktop": {
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
-            "js/SendGridMail.js"
+            "https://cdn.jsdelivr.net/npm/sweetalert2@9.6.0/dist/sweetalert2.min.js",
+            "js/desktop.js"
         ],
         "css": [
-            "css/51-current-defult.css",
-            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
+            "css/51-modern-default.css",
+            "https://cdn.jsdelivr.net/npm/sweetalert2@9.6.0/dist/sweetalert2.min.css",
             "css/sendgrid-design.css",
             "https://fonts.googleapis.com/icon?family=Material+Icons"
         ]
     },
     "config": {
-        "html": "html/SendGridConfig.html",
+        "html": "html/config.html",
         "js": [
             "https://js.kintone.com/jquery/1.11.1/jquery.min.js",
-            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.js",
-            "js/SendGridConfig.js"
+            "https://cdn.jsdelivr.net/npm/sweetalert2@9.6.0/dist/sweetalert2.min.js",
+            "js/config.js"
         ],
         "css": [
-            "css/51-current-defult.css",
-            "https://cdn.jsdelivr.net/sweetalert2/6.2.9/sweetalert2.min.css",
+            "css/51-modern-default.css",
+            "https://cdn.jsdelivr.net/npm/sweetalert2@9.6.0/dist/sweetalert2.min.css",
+            "https://fonts.googleapis.com/icon?family=Material+Icons",
             "css/sendgrid-design.css"
 
         ],
         "required_params": [
+            "templateGeneration",
             "templateName",
             "templateId",
             "emailFieldCode",

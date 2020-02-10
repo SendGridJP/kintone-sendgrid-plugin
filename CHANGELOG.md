@@ -1,5 +1,10 @@
 # Change Log
 
+## [11] - 2020/02/10
+- Support Dynamic Transactional Template
+- Support Sandbox mode
+- Support To name
+
 ## [10] - 2018/05/03
 - Support duplicate values for the recipient address
 - Support guest space

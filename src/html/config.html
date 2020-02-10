@@ -1,0 +1,216 @@
+<div>
+  <h1><span id="title_label"></span></h1>
+  <div class="config">
+    <ul class="tab">
+      <li class="active">
+        <a href="#" id="general_settings_label"></a>
+      </li>
+      <li>
+        <a href="#" id="spot_send_settings_label"></a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <!-- General settings -->
+      <div class="tab-pain active">
+        <h2><span id="auth_sub_title_label"></span></h2>
+        <!-- API key -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="auth_container_label"></span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-input-outer">
+            <input type="password" id="sendgrid_apikey" class="kintoneplugin-input-text"></input>
+          </div>
+          <div class="kintoneplugin-alert" id="sendgrid_apikey_alert" style="display: none"></div>
+          <div class="kintoneplugin-row">
+            <span id="auth_help_label" class="kintoneplugin-desc"></span>
+            <a id="auth_link" href="https://sendgrid.com/docs/User_Guide/Settings/api_keys.html" target="_blank">
+              <span id ="auth_link_label"></span>
+            </a><br />
+            <span id="auth_permission_label" class="kintoneplugin-desc"></span>
+            <ul class="items">
+              <li class="kintoneplugin-desc">mail.send</li>
+              <li class="kintoneplugin-desc">templates.read</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Spot send settings -->
+      <div class="tab-pain">
+        <h2><span id="email_sub_title_label"></span></h2>
+        <!-- From -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="email_from_container_label">From</span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-input-outer">
+            <input id="from" class="kintoneplugin-input-text"></input>
+          </div>
+        </div>
+        <!-- From name -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="email_from_name_container_label"></span>
+          </div>
+          <div class="kintoneplugin-input-outer">
+            <input id="from_name" class="kintoneplugin-input-text"></input>
+          </div>
+        </div>
+        <!-- To -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span>To</span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-select-outer">
+            <div class="kintoneplugin-select">
+              <select id="to_select"></select>
+            </div>
+          </div>
+          <div class="kintoneplugin-row">
+            <span id="email_to_help_label" class="kintoneplugin-desc"></span>
+          </div>
+        </div>
+        <!-- To name -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="email_to_name_container_label"></span>
+          </div>
+          <div class="kintoneplugin-select-outer">
+            <div class="kintoneplugin-select">
+              <select id="to_name_select"></select>
+            </div>
+          </div>
+          <div class="kintoneplugin-row">
+            <span id="email_to_name_help_label" class="kintoneplugin-desc"></span>
+          </div>
+        </div>
+        <!-- Content type -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="content_type_label"></span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-input-radio-item">
+              <span class="kintoneplugin-input-radio-item">
+                <input type="radio" name="content_type" value="multipart/alternative" id="content_type_multipart">
+                <label id="content_type_multipart_label" for="content_type_multipart"></label>
+                <input type="radio" name="content_type" value="text/plain" id="content_type_plain">
+                <label id="content_type_plain_label" for="content_type_plain"></label>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <h2><span id="template_sub_title_label"></span></h2>
+        <!-- Dynamic or Legacy -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id="template_generation_label"></span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <div class="kintoneplugin-row">
+            <div class="kintoneplugin-input-radio-item">
+              <span class="kintoneplugin-input-radio-item">
+                <input type="radio" name="template_generation" value="dynamic" id="template_generation_dynamic" checked>
+                <label for="template_generation_dynamic">Dynamic</label>
+                <input type="radio" name="template_generation" value="legacy" id="template_generation_legacy">
+                <label for="template_generation_legacy">Legacy</label>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mail Template -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span id ="template_container_label"></span>
+            <span class="kintoneplugin-require">*</span>
+          </div>
+          <!--  -->
+          <div class="kintoneplugin-row child-vertical-center">
+            <div class="kintoneplugin-select-outer">
+              <div class="kintoneplugin-select">
+                <select id="template_select">
+                  <option></option>
+                </select>
+              </div>
+            </div>
+            <a class="icon-outer" id="refresh-templates" href="#">
+              <i class="material-icons">refresh</i>
+            </a>
+            <a class="icon-outer" id="template_edit_label" href="https://sendgrid.com/templates" target="_blank">
+              <i class="material-icons">edit</i>
+            </a>
+          </div>
+          <div class="kintoneplugin-alert" id="template_select_alert"></div>
+          <div class="kintoneplugin-row">
+            <strong>Subject</strong>
+            <div id="template_result_subject"></div>
+          </div>
+          <div class="kintoneplugin-row">
+            <strong>TEXT</strong>
+            <div>
+              <textarea id="template_result_text" cols="80" rows="10" disabled="true"></textarea>
+            </div>
+          </div>
+          <div class="kintoneplugin-row" id="template_html_container">
+            <strong>HTML</strong>
+            <div>
+              <iframe id="template_result_iframe" width="655px" height="250px"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <h2><span id="optional_sub_title_label"></span></h2>
+        <!-- Sandbox mode -->
+        <div class="kintoneplugin-row">
+          <div class="kintoneplugin-label">
+            <span class="sandbox_mode_container_label"></span>
+          </div>
+          <div class="kintoneplugin-input-checkbox">
+            <span class="kintoneplugin-input-checkbox-item">
+              <input type="checkbox" name="sandbox_mode" value="true" id="sandbox_mode">
+              <label for="sandbox_mode" class="sandbox_mode_container_label"/>
+            </span>
+          </div>
+          <span id="sandbox_mode_help_label" class="kintoneplugin-desc"></span>
+        </div>
+        <!-- Substitution settings -->
+        <div class="kintoneplugin-row" id="substitution-settings">
+          <div class="kintoneplugin-label">
+            <span id="sub_sub_title_label"></span>
+          </div>
+          <div id="sub_container"></div>
+          <button type="button" id="add-sub" class="kintoneplugin-button-small child-vertical-center">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+        <!-- Dynamic template data settings  -->
+        <div class="kintoneplugin-row" id="dtd-settings">
+          <div class="kintoneplugin-label">
+            <span id="dtd_title_label"></span>
+          </div>
+          <span id="dtd_help_label" class="kintoneplugin-desc">aaaaaa</span>
+          <div id="dtd_container">
+          </div>
+          <button type="button" id="add-dtd" class="kintoneplugin-button-small child-vertical-center">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kintoneplugin-row">
+    <button type="button" id="submit" class="kintoneplugin-button-dialog-ok">
+      <span id ="save_btn"></span>
+    </button>
+    <button type="button" id="cancel" class="kintoneplugin-button-dialog-cancel">
+      <span id = "cancel_btn"></span>
+    </button>
+  </div>
+</div>
