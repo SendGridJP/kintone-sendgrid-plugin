@@ -1,3 +1,4 @@
 *.ppk
 build.sh
 node_modules
+sample.csv
