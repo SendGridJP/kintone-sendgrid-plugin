@@ -64,6 +64,8 @@ var STRINGS = {
     'optional_sub_title_label': 'オプション設定',
     'sub_sub_title_label': '置換設定',
     'dtd_title_label': 'Dynamic Template Data設定',
+    'unsubscribe_group_label': '配信停止グループ設定',
+    'use_unsubscribe_group_label': '配信停止グループを利用する',
     'group_text_label': 'テキストフィールド',
     'group_rich_text_label': 'リッチテキストフィールド',
     'group_array_label': '配列フィールド',
@@ -75,6 +77,7 @@ var STRINGS = {
     'dtd_variable_error': 'Dynamic Template Dataのキーには半角英数（{}.を除く）のみ使用可能です',
     'sendgrid_apikey_alert': 'APIキーの確認に失敗しました。 ',
     'template_select_alert': 'テンプレートの取得に失敗しました。 ',
+    'unsubscribe_group_alert': '配信停止グループの取得に失敗しました。',
     'sendgrid_apikey_required': 'APIキーは必須です',
     'from_required': 'Fromは必須です',
     'to_required': 'Toフィールドは必須です',
@@ -107,6 +110,8 @@ var STRINGS = {
     'optional_sub_title_label': 'Optional settings',
     'sub_sub_title_label': 'Substitution settings',
     'dtd_title_label': 'Dynamic Template Data',
+    'unsubscribe_group_label': 'Unsubsucribe group settings',
+    'use_unsubscribe_group_label': 'Use unsubscribe group',
     'group_text_label': 'Text fields',
     'group_rich_text_label': 'Rich text fields',
     'group_array_label': 'Array fields',
@@ -118,6 +123,7 @@ var STRINGS = {
     'dtd_variable_error': 'Dynamic Template Data key must be single byte characters (except {}.)',
     'sendgrid_apikey_alert': 'API validate failed. ',
     'template_select_alert': 'Getting templates failed. ',
+    'unsubscribe_group_alert': 'Getting unsubscribe groups failed. ',
     'sendgrid_apikey_required': 'API key is required',
     'from_required': 'From is required',
     'to_required': 'To field is required',
@@ -208,6 +214,20 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       addDtd('', '', resp);
     });
 
+    // Event : Click use unsubscribe group checkbox
+    $('#use_unsubscribe_group').on('click', function() {
+      var useUnsubscribeGroup = String($('#use_unsubscribe_group').prop('checked'));
+      refreshPermissionLabel(useUnsubscribeGroup);
+      refreshUnsubscribeGroupSettings(useUnsubscribeGroup);
+    });
+
+    // Event : Refresh Unsubscribe Groups
+    $('#refresh-unsubscribe-groups').on('click', function() {
+      var useUnsubscribeGroup = String($('#use_unsubscribe_group').prop('checked'));
+      refreshUnsubscribeGroupSettings(useUnsubscribeGroup);
+      return false;
+    });
+
     // Event : Click Save Button
     $('#submit').on('click', async function() {
       // Required field check
@@ -226,11 +246,8 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       if (!$('input[name=template_generation]:checked').val()) {
         return Swal.fire('Error', getStrings(lang, 'template_generation_required'), 'error');
       }
-      // Validate API key
       var apiKeyAlert = $('#sendgrid_apikey_alert');
       try {
-        await validateApiKey();
-        apiKeyAlert.empty().hide();
         // Save app config
         var saveConfig = {};
         saveConfig.from = $('#from').val();
@@ -242,6 +259,11 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
         saveConfig.emailFieldCode = $('#to_select').val();
         saveConfig.toNameFieldCode = $('#to_name_select').val();
         saveConfig.sandboxMode = String($('#sandbox_mode').prop('checked'));
+        saveConfig.useUnsubscribeGroup = String($('#use_unsubscribe_group').prop('checked'));
+        saveConfig.unsubscribeGroupId = $('#unsubscribe_group_select').children(':selected').val();
+        // Validate API key
+        await validateApiKey(saveConfig.useUnsubscribeGroup);
+        apiKeyAlert.empty().hide();
         // substitution tags
         if (saveConfig.subNumber === undefined) {
           saveConfig.subNumber = 0;
@@ -354,12 +376,19 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     $('#optional_sub_title_label').text(getStrings(lang, 'optional_sub_title_label'));
     $('#sub_sub_title_label').text(getStrings(lang, 'sub_sub_title_label'));
     $('#dtd_title_label').text(getStrings(lang, 'dtd_title_label'));
+    $('#unsubscribe_group_label').text(getStrings(lang, 'unsubscribe_group_label'));
+    $('#use_unsubscribe_group_label').text(getStrings(lang, 'use_unsubscribe_group_label'));
     $('#save_btn').text(getStrings(lang, 'save_btn'));
     $('#cancel_btn').text(getStrings(lang, 'cancel_btn'));
     $('#dtd_help_label').text(getStrings(lang, 'dtd_help_label'));
   }
 
   async function showConfigData(config) {
+    // unsubscribe grou@
+    var useUnsubscribeGroup = config.useUnsubscribeGroup;
+    if (!config.useUnsubscribeGroup) {
+      useUnsubscribeGroup = 'false';
+    }
     // API key
     var cg = kintone.plugin.app.getProxyConfig('https://api.sendgrid.com/', 'POST');
     if (cg !== null) {
@@ -368,7 +397,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
         $('#sendgrid_apikey').val(apiKey[1]);
       }
       try {
-        await validateApiKey();
+        await validateApiKey(useUnsubscribeGroup);
         $('#sendgrid_apikey_alert').empty().hide();
       } catch(err) {
         var text = getStrings(lang, 'sendgrid_apikey_alert');
@@ -377,6 +406,7 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
           .show();
       }
     }
+    refreshPermissionLabel(useUnsubscribeGroup);
     // from
     $('#from').val(config.from);
     // from name
@@ -414,9 +444,12 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
     refreshOptionalSettings(templateGeneration);
     // Show kintone data
     await showKintoneData();
+    // Unsubscribe Group
+    $('#use_unsubscribe_group').prop('checked', useUnsubscribeGroup === 'true');
+    refreshUnsubscribeGroupSettings(useUnsubscribeGroup);
   }
 
-  async function validateApiKey() {
+  async function validateApiKey(useUnsubscribeGroup) {
     var url = 'https://api.sendgrid.com/v3/scopes';
     var resp = await kintone.proxy(url, 'GET', getHeaders(), {});
     var response = JSON.parse(resp[0]);
@@ -425,9 +458,11 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       throw new Error('Http error: ' + status + ', ' + JSON.stringify(response));
     }
     if (response.errors === undefined && response.scopes.length > 0) {
-      if (($.inArray('mail.send', response.scopes) < 0) ||
-          ($.inArray('templates.read', response.scopes) < 0)) {
-        throw new Error('Lack of scopes: ' + JSON.stringify(response.scopes));
+      var requiredPermissions = getRequiredPermission(useUnsubscribeGroup);
+      for (var i = 0; i < requiredPermissions.length; i++) {
+        if (response.scopes.indexOf(requiredPermissions[i]) < 0) {
+          throw new Error('Lack of scopes: ' + JSON.stringify(response.scopes));
+        }
       }
       return response;
     }
@@ -734,6 +769,73 @@ var EXP_DTD = /^[a-zA-Z0-9!--/:-@¥[-`|~]+$/;
       valOption.prop('selected', true);
     }
     return valOption;
+  }
+
+  async function getUnsubscribeGroups() {
+    var url = 'https://api.sendgrid.com/v3/asm/groups';
+    var resp = await kintone.proxy(url, 'GET', getHeaders(), {});
+    var response = JSON.parse(resp[0]);
+    var status = resp[1];
+    if (status !== 200) {
+      throw new Error('Http error: ' + status + ', ' + JSON.stringify(response));
+    }
+    if (response.errors === undefined && response.length > 0) {
+      return response;
+    }
+    throw new Error('Unknown response: ' + status + ', ' + JSON.stringify(response));
+  }
+
+  function refreshPermissionLabel(useUnsubscribeGroup) {
+    var requiredPermissions = getRequiredPermission(useUnsubscribeGroup);
+    var permissionList = $('#permission_list');
+    permissionList.empty();
+    for (var i = 0; i < requiredPermissions.length; i++) {
+      var li = $('<li />', {'class': 'kintoneplugin-desc', text: requiredPermissions[i]});
+      permissionList.append(li);
+    }
+  }
+
+  async function refreshUnsubscribeGroupSettings(useUnsubscribeGroup) {
+    if (useUnsubscribeGroup === 'true') {
+      $('#unsubscribe_group_container').show();
+      // Unsubscribe Groups
+      var unsubscribeGroupSelect = $('#unsubscribe_group_select');
+      var alert = $('#unsubscribe_group_select_alert');
+      try {
+        var unsubscribeGroups = await getUnsubscribeGroups();
+        alert.empty().hide();
+        unsubscribeGroupSelect.empty();
+        for (var m = 0; m < unsubscribeGroups.length; m++) {
+          var unsubscribeGroup = unsubscribeGroups[m];
+          var selected = (config.unsubscribeGroupId === String(unsubscribeGroup.id));
+          var option = $('<option />', {
+            value: unsubscribeGroup.id,
+            text: unsubscribeGroup.name,
+            selected: selected,
+            'class': 'goog-inline-block goog-menu-button-inner-box'
+          });
+          unsubscribeGroupSelect.append(option);
+        }
+      } catch(err) {
+        var text = getStrings(lang, 'template_select_alert');
+        alert.empty();
+        unsubscribeGroupSelect.empty();
+        alert.append($('<p />', {text: text + err})).show();
+      }
+    } else {
+      $('#unsubscribe_group_container').hide();
+    }
+  }
+
+  function getRequiredPermission(useUnsubscribeGroup) {
+    var permissions = [
+      'mail.send',
+      'templates.read'
+    ];
+    if (useUnsubscribeGroup === 'true') {
+      permissions.push('asm.groups.read');
+    }
+    return permissions;
   }
 
   function isEmailField(field) {
