@@ -325,6 +325,9 @@ var STRINGS = {
       param.content = [];
       param.content.push({'type': 'text/plain', 'value': ' '});
     }
+    if (config.useUnsubscribeGroup === 'true') {
+      param.asm = {'group_id': Number(config.unsubscribeGroupId)};
+    }
     return param;
   }
 
