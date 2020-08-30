@@ -7,7 +7,7 @@
 - 以下いずれかのブラウザ
   - [Google Chrome](https://www.google.com/intl/ja_jp/chrome/)
   - [mozilla firefox](https://www.mozilla.org/ja/firefox/)  
-  Internet Explorerで動作させるには[旧バージョン](https://github.com/SendGridJP/kintone-sendgrid-plugin/releases/tag/10)をご利用ください。
+  Internet Explorerで動作させるには[旧バージョンのプラグイン](https://github.com/SendGridJP/kintone-sendgrid-plugin/releases/tag/10)をご利用ください。
 
 # 利用方法
 

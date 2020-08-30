@@ -1,6 +1,6 @@
 # Change Log
 
-## [12] - 2020/XX/XX
+## [12] - 2020/08/30
 - Support Single Send
 - Support Group Unsubscribe
 
