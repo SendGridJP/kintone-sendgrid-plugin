@@ -1,5 +1,9 @@
 # Change Log
 
+## [12] - 2020/08/30
+- Support Single Send
+- Support Group Unsubscribe
+
 ## [11] - 2020/02/10
 - Support Dynamic Transactional Template
 - Support Sandbox mode

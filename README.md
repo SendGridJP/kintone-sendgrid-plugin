@@ -78,6 +78,11 @@ See [here](https://sendgridjp.github.io/kintone-sendgrid-plugin/) in Japanese.
   Trying to upload plugin.zip
   plugin.zip をアップロードしました!
   ```
+5. Creating test data
+  ```
+  $ cd test/data
+  $ ruby make.rb
+  ```
 
 ## Licence
 

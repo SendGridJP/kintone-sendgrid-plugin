@@ -7,12 +7,12 @@
 - 以下いずれかのブラウザ
   - [Google Chrome](https://www.google.com/intl/ja_jp/chrome/)
   - [mozilla firefox](https://www.mozilla.org/ja/firefox/)  
-  Internet Explorerで動作させるには[旧バージョン](https://github.com/SendGridJP/kintone-sendgrid-plugin/releases/tag/10)をご利用ください。
+  Internet Explorerで動作させるには[旧バージョンのプラグイン](https://github.com/SendGridJP/kintone-sendgrid-plugin/releases/tag/10)をご利用ください。
 
 # 利用方法
 
 ## 1. kintoneアプリの準備
-本プラグインが動作するためにkintoneアプリ側では宛先アドレスを格納するフィールドが必要になります。宛先アドレスとして指定可能なフィールドは以下いずれかである必要があります。
+本プラグインを利用するためにkintoneアプリ側では宛先アドレスを格納するフィールドが必要になります。宛先アドレスとして指定可能なフィールドは以下いずれかである必要があります。
 ※本プラグインはメールアドレスの形式チェックを行いません。kintone上でメールアドレスの形式チェックを行えるよう「リンク」フィールド（メールアドレス）の利用を推奨します。
 
 - 「文字列(1行)」フィールド
@@ -93,7 +93,37 @@ kintoneのデータでif~else句を制御する場合、テンプレートにタ
 [![](images/15-6-6.png)](images/15-6-6.png)
 [![](images/15-6-7.png)](images/15-6-7.png)
 
-### 3-7. 設定の保存
+### 3-7. 配信停止設定
+
+配信停止設定を利用する場合、「配信停止グループを利用する」を有効化して、利用するグループ名を選択します。
+
+[![](images/15-13.png)](images/15-13.png)
+
+続いて、テンプレートに配信停止タグを記載します。テンプレート種別によって利用可能な配信停止タグが異なります。
+
+#### 3-7-1. Dynamicテンプレートで配信停止タグを記載する
+
+Dynamicテンプレートでは以下2種類の配信停止タグが利用できます。
+
+- ワンクリック配信停止用タグ
+  `{{{unsubscribe}}}`
+- 配信停止管理用タグ
+  `{{{unsubscribe_preferences}}}`
+
+[![](images/15-14.png)](images/15-14.png)
+
+#### 3-7-2. Legacyテンプレートで配信停止タグを記載する
+
+Legacyテンプレートでは以下2種類の配信停止タグが利用できます。
+
+- ワンクリック配信停止用タグ
+  `<%asm_group_unsubscribe_raw_url%>`
+- 配信停止管理用タグ
+  `<%asm_preferences_raw_url%>`
+
+[![](images/15-15.png)](images/15-15.png)
+
+### 3-8. 設定の保存
 
 設定が完了したら「保存」ボタンを選択して設定を保存します。
 
@@ -129,6 +159,10 @@ kintoneのデータでif~else句を制御する場合、テンプレートにタ
 テンプレートが適用されてメール送信されます。
 
 [![](images/15-12.png)](images/15-12.png)
+
+配信停止設定を利用した場合、タグが配信停止リンクに置換されます。
+
+[![](images/15-16.png)](images/15-16.png)
 
 # ライセンス
 [MITライセンス](https://github.com/SendGridJP/kintone-sendgrid-plugin/blob/master/LICENSE.txt)で提供しています。

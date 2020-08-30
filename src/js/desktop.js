@@ -13,9 +13,7 @@ var STRINGS = {
     'validation_succeeded': 'メールの送信リクエストのチェックに成功しました。',
     'request': 'メールの送信リクエスト',
     'request_failed': 'メールの送信リクエストに失敗しました。',
-    'kintone_error': 'Kintoneエラー。',
-    'warning_sending_title': 'メールを送信する前に画面をリロードしてください',
-    'warning_sending_message': 'メールリストの反映にはリロードが必要です'
+    'kintone_error': 'Kintoneエラー。'
   },
   'default': {
     'template_label': 'Template',
@@ -24,74 +22,155 @@ var STRINGS = {
     'send': 'Send',
     'request_parameters': 'Request parameters',
     'sandbox_mode': 'Sandbox mode',
-    'sandbox_mode_message': 'Validate the parameters for Mail Send API. It doesn\'t send any email.',
+    'sandbox_mode_message': 'Validate parameters for Mail Send API. It doesn\'t send any email.',
     'request_succeeded': 'Your requests for mail sending were successful.',
     'validation_succeeded': 'The validation for Mail Send API parameters were successful.',
     'request': 'Request',
     'request_failed': 'Your requests for mail sending were failed.',
-    'kintone_error': 'Kintone error.',
-    'warning_sending_title': 'Before mail will be sending, reloading is required.',
-    'warning_sending_message': 'Reloading is required'
+    'kintone_error': 'Kintone error.'
   }
 };
 
 (function($, PLUGIN_ID) {
   'use strict';
-  //Config key
+  // Config key
   var config = kintone.plugin.app.getConfig(PLUGIN_ID);
-  //User Information
+  // Template generation
+  var templateGeneration = 'legacy';
+  if (config.templateGeneration) {
+    templateGeneration = config.templateGeneration;
+  }
+  // Sandbox mode
+  var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
+  // User Information
   var userInfo = kintone.getLoginUser();
-  //appId
+  // appId
   var appId = kintone.app.getId();
   // SendMail progress
   var progress = 0;
   //
   var lang = userInfo.language;
 
-  // Event : Record show
+  // Event : Record index show
   kintone.events.on('app.record.index.show', async function(event) {
-    if ($('#send_mail').length > 0) {
-      return event;
+    var ctrl = headerController(templateGeneration);
+    if ($(kintone.app.getHeaderMenuSpaceElement()).find('#sendgrid-controller').length == 0) {
+      $(kintone.app.getHeaderMenuSpaceElement()).append(ctrl);
+      populateTemplates(templateGeneration);
     }
-    var templateGeneration = config.templateGeneration;
-    if (!config.templateGeneration) {
-      templateGeneration = 'legacy';
-    }
-    // Label on HeaderMenuSpace
-    var labelIcon = $('<i />', {
-      text: 'mail',
-      'class': 'material-icons vertical-align-middle'
+    // Send bulk mail
+    $('#send_mail').on('click', async function() {
+      try {
+        var condition= kintone.app.getQueryCondition();
+        var resp = await kintone.api(
+          kintone.api.url('/k/v1/records', true), 'GET',
+          {app: appId, query: condition, totalCount: true}
+        );
+        if (resp.totalCount == 0) return;
+        // start progress
+        initProgress();
+        // confirm & cancel
+        if (!(await confirmSend(sandboxMode)).value) return;
+        // send mail
+        await processRecords(condition, 500, 0, resp.totalCount);
+        // Finish to send
+        await finishProgress();
+      } catch(err) {
+        console.log(err);
+        Swal.fire('Failed', err.message, 'error');
+      } finally {
+        cleanupProgress();
+      }
     });
-    var labelText = getStrings(lang, 'template_label');
+    return event;
+  });
+
+  // Event : Record detail show
+  kintone.events.on('app.record.detail.show', async function(event) {
+    var ctrl = headerController(templateGeneration);
+    $(kintone.app.record.getHeaderMenuSpaceElement()).append(ctrl);
+    populateTemplates(templateGeneration);
+    // Send single mail
+    $('#send_mail').on('click', async function() {
+      try {
+        // start progress
+        initProgress();
+        // confirm & cancel
+        if (!(await confirmSend(sandboxMode)).value) return;
+        // send mail
+        var param = makeParams([event.record], config, sandboxMode);
+        await showRequest(param, sandboxMode);
+        if (param.personalizations.length > 0) {
+          await sendMail(param);
+        }
+        // Finish to send
+        await finishProgress();
+      } catch(err) {
+        console.log(err);
+        Swal.fire('Failed', err.message, 'error');
+      } finally {
+        cleanupProgress();
+      }
+    });
+    return event;
+  });
+
+  // Make controllers on UI for users
+  function headerController(templateGeneration) {
+    var container = $('<div/>').prop('id', 'sendgrid-controller');
+    // Icon
+    var labelIcon = $('<i/>')
+      .text('mail')
+      .addClass('material-icons')
+      .addClass('vertical-align-middle')
+    container.append(labelIcon);
+    // Label for template
+    var text = getStrings(lang, 'template_label');
     var url = 'https://sendgrid.com/templates';
     if (templateGeneration === 'dynamic') {
       url = 'https://mc.sendgrid.com/dynamic-templates';
     }
-    var labelTemplate = $('<a />', {
-      text: labelText,
-      href: url,
-      target: '_blank',
-      'class': 'header-menu-item'
-    });
-    $(kintone.app.getHeaderMenuSpaceElement('buttonSpace'))
-      .append(labelIcon)
-      .append(labelTemplate);
-
-    // Template Select on HeaderMenuSpace
-    var templateOuter = $('<div />', {
-      'class': 'kintoneplugin-select-outer header-menu-item header-menu-item-middle'
-    });
-    var templateDiv = $('<div />', {
-      'class': 'kintoneplugin-select'
-    });
-    var templateSpace = $('<select />', {
-      id: 'temp_select'
-    });
+    var linkTemplate = $('<a />')
+      .text(text)
+      .prop('href', url)
+      .prop('target', '_blank')
+      .addClass('header-menu-item');
+    container.append(linkTemplate);
+    // Template Select
+    var templateOuter = $('<div />')
+      .addClass('kintoneplugin-select-outer')
+      .addClass('header-menu-item')
+      .addClass('header-menu-item-middle');
+    var templateDiv = $('<div />')
+      .addClass('kintoneplugin-select');
+    var templateSpace = $('<select />')
+      .prop('id', 'temp_select');
     templateDiv.append(templateSpace);
     templateOuter.append(templateDiv);
-    $(kintone.app.getHeaderMenuSpaceElement()).append(templateOuter);
+    container.append(templateOuter);
+    // Send Button on HeaderMenuSpace
+    var sendIcon = $('<i />')
+      .addClass('material-icons')
+      .addClass('vertical-align-middle')
+      .text('send');
+    var sendButton = $('<button />')
+      .prop('id', 'send_mail')
+      .addClass('header-menu-item')
+      .addClass('kintoneplugin-button-small-disabled');
+    sendButton.append(sendIcon);
+    container.append(sendButton);
+    // Progress on HeaderMenuSpace
+    var progress = $('<progress />')
+      .prop('width', '100%')
+      .prop('id', 'progress');
+    progress.hide();
+    container.append(progress);
+    return container;
+  }
 
-    // Get Templates
+  async function populateTemplates(templateGeneration) {
+    // Templates select
+    var templateSpace = $('#temp_select');
     var templates = await getTemplates(templateGeneration);
     for (var m = 0; m < templates.length; m++) {
       var template = templates[m];
@@ -99,69 +178,23 @@ var STRINGS = {
         var version = template.versions[n];
         if (version.active === 1) {
           var selected = (config.templateId === template.id);
-          var option = $('<option />', {
-            value: template.id,
-            text: template.name,
-            selected: selected,
-            'class': 'goog-inline-block goog-menu-button-inner-box'
-          });
+          var option = $('<option />')
+            .prop('value', template.id)
+            .text(template.name)
+            .prop('selected', selected)
+            .addClass('goog-inline-block')
+            .addClass('goog-menu-button-inner-box');
           templateSpace.append(option);
         }
       }
     }
-
-    // Send Button on HeaderMenuSpace
-    var records = event.records;
-    var sendIcon = $('<i />', {
-      'class': 'material-icons vertical-align-middle',
-      text: 'send'
-    });
-    var buttonClass = (records.length === 0) ? 'header-menu-item kintoneplugin-button-small-disabled' : 'header-menu-item kintoneplugin-button-small';
-    var sendButton = $('<button />', {
-      id: 'send_mail',
-      'class': buttonClass
-    });
-    sendButton.append(sendIcon);
-    $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(sendButton);
-
-    // Send Mail
-    $('#send_mail').on('click', async function() {
-      try {
-        initProgress();
-        if (records.length == 0) return;
-        var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
-        var result = await confirmSend(sandboxMode);
-        // cancel
-        if (!result.value) return;
-        // send mail
-        var condition= kintone.app.getQueryCondition();
-        var resp = await kintone.api(
-          kintone.api.url('/k/v1/records', true), 'GET',
-          {app: appId, query: condition, totalCount: true}
-        );
-        await processRecords(condition, 500, 0, resp.totalCount);
-        // Finish to send
-        if (sandboxMode) {
-          Swal.fire('Complete', getStrings(lang, 'validation_succeeded'), 'success');
-        } else {
-          Swal.fire('Complete', getStrings(lang, 'request_succeeded'), 'success');
-        }
-      } catch(err) {
-        Swal.fire('Failed', err.message, 'error');
-      } finally {
-        finishProgress();
-      }
-    });
-
-    // Progress on HeaderMenuSpace
-    var progress = $('<progress />', {
-      width: '100%',
-      id: 'progress',
-    });
-    progress.hide();
-    $(kintone.app.getHeaderMenuSpaceElement('buttonSpace')).append(progress);
-    return event;
-  });
+    // Send Mail button
+    var sendButton = $('#send_mail');
+    if (templates.length > 0) {
+      sendButton.removeClass('kintoneplugin-button-small-disabled');
+      sendButton.addClass('kintoneplugin-button-small');
+    }
+  }
 
   function confirmSend(sandboxMode) {
     if (sandboxMode) {
@@ -187,17 +220,28 @@ var STRINGS = {
     }
   }
 
-  // Initialize send mail process
+  // Initialize send mail progress
   function initProgress() {
     progress = 0;
     $('#progress').show();
   }
 
+  // Update send mail progress
   function updateProgress(progress) {
     $('#progress').attr('value', progress);
   }
 
-  function finishProgress() {
+  // Finish progress
+  async function finishProgress() {
+    if (sandboxMode) {
+      Swal.fire('Complete', getStrings(lang, 'validation_succeeded'), 'success');
+    } else {
+      Swal.fire('Complete', getStrings(lang, 'request_succeeded'), 'success');
+    }
+  }
+
+  // Cleanup progress
+  function cleanupProgress() {
     $('#progress').hide();
   }
 
@@ -215,16 +259,9 @@ var STRINGS = {
       message = message + '<br />message: ' + err.message;
       throw new Error(message);
     }
-    var sandboxMode = (config.sandboxMode.toLowerCase() === 'true');
     var param = makeParams(respKintone.records, config, sandboxMode);
+    await showRequest(param, sandboxMode);
     if (param.personalizations.length > 0) {
-      if (sandboxMode) {
-        await Swal.fire(
-          {
-            title: 'Request', icon: 'info', grow: 'row', text: getStrings(lang, 'request'), input: 'textarea', inputValue: JSON.stringify(param, null , 2)
-          }
-        );
-      }
       await sendMail(param);
     }
     var newOffset = offset + limit;
@@ -238,10 +275,6 @@ var STRINGS = {
   function makeParams(records, config, sandbox_mode) {
     var param = {};
     var personalizations = [];
-    var templateGeneration = config.templateGeneration;
-    if (!config.templateGeneration) {
-      templateGeneration = 'legacy';
-    }
     if (templateGeneration === 'legacy') {
       // Legacy Transactional Template
       for (var i = 0; i < records.length; i++) {
@@ -292,7 +325,26 @@ var STRINGS = {
       param.content = [];
       param.content.push({'type': 'text/plain', 'value': ' '});
     }
+    if (config.useUnsubscribeGroup === 'true') {
+      param.asm = {'group_id': Number(config.unsubscribeGroupId)};
+    }
     return param;
+  }
+
+  // Show request if sandbox mode
+  async function showRequest(param, sandboxMode) {
+    if (sandboxMode) {
+      await Swal.fire(
+        {
+          title: 'Request',
+          icon: 'info',
+          grow: 'row',
+          text: getStrings(lang, 'request'),
+          input: 'textarea',
+          inputValue: JSON.stringify(param, null , 2)
+        }
+      );
+    }
   }
 
   //Send mail function
@@ -317,13 +369,7 @@ var STRINGS = {
     throw new Error(JSON.stringify(response.errors));
   }
 
-  kintone.events.on('app.record.index.edit.submit', function(event) {
-    var title = getStrings(lang, 'warning_sending_title');
-    var message = getStrings(lang, 'warning_sending_message');
-    Swal.fire(title, message, 'warning');
-    return event;
-  });
-
+  // Get string resources
   function getStrings(language, key) {
     var value = '';
     if (language in STRINGS) {
